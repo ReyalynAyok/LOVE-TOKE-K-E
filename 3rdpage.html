@@ -1,0 +1,856 @@
+<!-- =========================
+   3rdpage.html
+========================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Our Memories</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --pink-main: #d86c9c;
+      --pink-deep: #c85a8d;
+      --pink-soft: #f48fb1;
+      --pink-light: #f8bbd0;
+      --pink-border: #f4a6c8;
+      --text-soft: #b85f87;
+
+      --bg-1: #fff7fb;
+      --bg-2: #ffeaf4;
+      --card-bg: rgba(255, 255, 255, 0.92);
+
+      --shadow-soft: 0 14px 32px rgba(216, 108, 156, 0.14);
+      --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.28);
+
+      --frame-radius: 50px;
+      --screen-radius: 40px;
+      --phone-width: min(390px, 94vw);
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0d7df;
+      touch-action: manipulation;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button {
+      font-family: inherit;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.22s ease,
+        opacity 0.22s ease,
+        background 0.22s ease;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.96);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16) inset;
+    }
+
+    .phone-frame {
+      width: var(--phone-width);
+      aspect-ratio: 390 / 844;
+      background: #000;
+      border-radius: var(--frame-radius);
+      padding: 12px;
+      box-shadow: var(--shadow-strong);
+      position: relative;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--screen-radius);
+      overflow: hidden;
+      position: relative;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      animation: appLaunch 0.72s ease-out;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.6), transparent 30%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      display: flex;
+      flex-direction: column;
+      isolation: isolate;
+    }
+
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    @keyframes appLaunch {
+      0% {
+        opacity: 0;
+        transform: scale(0.93);
+        filter: blur(8px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.015);
+        filter: blur(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding:
+        calc(env(safe-area-inset-top) + 40px)
+        16px
+        calc(env(safe-area-inset-bottom) + 18px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      min-height: 0;
+    }
+
+    .content::-webkit-scrollbar {
+      display: none;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .back-hub-btn,
+    .mini-pill {
+      min-height: 36px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--pink-main);
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(216, 108, 156, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .mini-pill {
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .page-title {
+      text-align: center;
+      color: var(--pink-main);
+      font-size: 21px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .page-subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 12.5px;
+      opacity: 0.9;
+      margin: 0 0 18px;
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      position: relative;
+    }
+
+    .card:active {
+      transform: scale(0.985);
+    }
+
+    .thumb-wrap {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #fff5f8, #ffe9f3);
+    }
+
+    .thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .thumb-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--pink-main);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.72), transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,187,208,0.24));
+      z-index: 0;
+    }
+
+    .label {
+      padding: 10px 9px 11px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--pink-main);
+      line-height: 1.3;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .more-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #f48fb1, #ec7faa);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(244, 143, 177, 0.25);
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    .viewer {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      padding:
+        calc(env(safe-area-inset-top) + 14px)
+        14px
+        calc(env(safe-area-inset-bottom) + 12px);
+      animation: fadeIn 0.26s ease;
+      z-index: 30;
+    }
+
+    .viewer.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .viewer-top {
+      flex-shrink: 0;
+      text-align: center;
+      color: var(--pink-main);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      padding: 0 8px;
+    }
+
+    .viewer-body {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      min-height: 0;
+      scrollbar-width: none;
+    }
+
+    .viewer-body::-webkit-scrollbar {
+      display: none;
+    }
+
+    #mediaContainer {
+      width: 100%;
+      min-height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .viewer img,
+    .viewer video {
+      width: 100%;
+      max-height: 49vh;
+      object-fit: contain;
+      border-radius: 16px;
+      transition: opacity 0.35s ease;
+      background: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    }
+
+    .caption {
+      padding: 11px 14px;
+      font-size: 13px;
+      color: var(--pink-main);
+      text-align: center;
+      line-height: 1.5;
+      width: 100%;
+      background: rgba(255, 240, 245, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 16px;
+      box-shadow:
+        0 8px 20px rgba(216, 108, 156, 0.14),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+      max-height: 21vh;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .caption::-webkit-scrollbar {
+      display: none;
+    }
+
+    .controls {
+      flex-shrink: 0;
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      min-width: 82px;
+      padding: 10px 14px;
+      border-radius: 15px;
+      background: #f8bbd0;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(248, 187, 208, 0.2);
+    }
+
+    .year-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 240px;
+      margin: 0 auto;
+    }
+
+    .year-buttons button {
+      padding: 12px;
+      border-radius: 15px;
+      background: linear-gradient(180deg, #f48fb1, #ec7faa);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 10px 20px rgba(244, 143, 177, 0.24);
+    }
+
+    .fade-out {
+      animation: fadeOut 0.85s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(1.03);
+      }
+    }
+
+    @media (max-width: 500px) {
+      html,
+      body {
+        background: #000;
+      }
+
+      body {
+        width: 100vw;
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+      }
+
+      .phone-frame {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        aspect-ratio: auto;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .phone-screen {
+        border-radius: 0;
+      }
+
+      .notch {
+        display: none;
+      }
+    }
+
+    @media (max-height: 720px) {
+      .content {
+        padding-top: calc(env(safe-area-inset-top) + 34px);
+      }
+
+      .page-title {
+        font-size: 19px;
+      }
+
+      .page-subtitle {
+        margin-bottom: 14px;
+      }
+
+      .thumb-wrap {
+        height: 90px;
+      }
+
+      .label {
+        font-size: 11.5px;
+        min-height: 44px;
+      }
+
+      .viewer img,
+      .viewer video {
+        max-height: 43vh;
+      }
+
+      .caption {
+        max-height: 19vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen" id="screen">
+      <div class="notch"></div>
+
+      <div class="content">
+        <div class="topbar">
+          <button class="back-hub-btn" id="backHubBtn" type="button">← Hub</button>
+          <div class="mini-pill">Memories</div>
+        </div>
+
+        <h1 class="page-title">Our Memories 💗</h1>
+        <p class="page-subtitle">A little gallery of us, one memory at a time.</p>
+
+        <div class="grid">
+          <div class="card" data-gallery="start">
+            <div class="thumb-wrap">
+              <div class="thumb-fallback">💗</div>
+              <img src="images/3rdpage/1.jpg" alt="Where it all started" onerror="this.style.display='none'">
+            </div>
+            <div class="label">Where it all started</div>
+          </div>
+
+          <div class="card" data-gallery="monthly">
+            <div class="thumb-wrap">
+              <div class="thumb-fallback">🗓️</div>
+              <img src="images/3rdpage/2.jpg" alt="Monthly updates" onerror="this.style.display='none'">
+            </div>
+            <div class="label">Monthly Updates</div>
+          </div>
+
+          <div class="card" data-gallery="random">
+            <div class="thumb-wrap">
+              <div class="thumb-fallback">🎞️</div>
+              <img src="images/3rdpage/3.jpg" alt="Random clips" onerror="this.style.display='none'">
+            </div>
+            <div class="label">Random Clips</div>
+          </div>
+
+          <div class="card" data-gallery="valentines">
+            <div class="thumb-wrap">
+              <div class="thumb-fallback">💘</div>
+              <img src="images/3rdpage/4.jpg" alt="Valentines" onerror="this.style.display='none'">
+            </div>
+            <div class="label">Valentines</div>
+          </div>
+
+          <div class="card" data-gallery="celebrations">
+            <div class="thumb-wrap">
+              <div class="thumb-fallback">🎂</div>
+              <img src="images/3rdpage/5.jpg" alt="Celebrations" onerror="this.style.display='none'">
+            </div>
+            <div class="label">Celebrations</div>
+          </div>
+
+          <div class="card" data-gallery="favorite">
+            <div class="thumb-wrap">
+              <div class="thumb-fallback">📸</div>
+              <img src="images/3rdpage/6.jpg" alt="Favorite pictures" onerror="this.style.display='none'">
+            </div>
+            <div class="label">My Fav Pictures Of You</div>
+          </div>
+        </div>
+
+        <button class="more-btn" id="moreBtn" type="button">
+          Reading time. Click me!😙
+        </button>
+      </div>
+
+      <div class="viewer" id="viewer" aria-hidden="true">
+        <div class="viewer-top" id="viewerTitle">Memory Viewer</div>
+
+        <div class="viewer-body" id="viewerBody">
+          <div id="mediaContainer"></div>
+          <div class="caption" id="caption"></div>
+        </div>
+
+        <div class="controls">
+          <button type="button" id="prevBtn">Prev</button>
+          <button type="button" id="nextBtn">Next</button>
+          <button type="button" id="closeBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screen = document.getElementById("screen");
+    const viewer = document.getElementById("viewer");
+    const viewerBody = document.getElementById("viewerBody");
+    const mediaContainer = document.getElementById("mediaContainer");
+    const caption = document.getElementById("caption");
+    const viewerTitle = document.getElementById("viewerTitle");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const moreBtn = document.getElementById("moreBtn");
+    const backHubBtn = document.getElementById("backHubBtn");
+    const cards = document.querySelectorAll(".card");
+
+    let currentGallery = [];
+    let currentIndex = 0;
+    let currentGalleryName = "";
+    let startX = 0;
+    let startY = 0;
+    let isLeaving = false;
+
+    const galleries = {
+      start: [
+        {type:"img",src:"images/3rdpage/wias/0.jpg",caption:"Ang simula ng lahat.😌 Kung alam ko lang na sobrang daming sakit sa ulo pala ibibigay mo sa akin, pinakyu na lang sana kita eh HAHAHAHAHAAHHA."},
+        {type:"img",src:"images/3rdpage/wias/1.jpg",caption:"This was taken the first time we met. Nag ugbo tayo. Sobrang biglaan and random. Tamang akbay ka pa sa akin niyan, Dudong. Tapos pagkahatid mo sa'kin pauwi, kiss agad hiningi mo. HAHAHAHAHAHA kapal! kaya ata ako na hook sa'yo e, first time ko maka-encounter nang kasing lakas ng loob mo!🤣"},
+        {type:"img",src:"images/3rdpage/wias/2.jpg",caption:"This was our very first picture together and the 2nd time we met. Nag simba tayo sa Quiapo then dumiretso sa bridge(I forgot the name😂). Walang hiya ka. Saya-saya ko pang umuwi niyan tas malamanlaman ko, hindi lang pala ako yung inaya mo mag simba!😌"},
+        {type:"img",src:"images/3rdpage/wias/3.jpg",caption:"This was the 3rd time we met. Sa megadike mo 'ko dinala then kumain tayo sa hideout. Now ko lang na-realize, pangatlong beses pa lang pala tayong nagkikita nanghawak ka na agad ng dede. At ako namang lokaloka, payag din. Grabeng ka bobo ko sayo, Indoy. Nag pangap ka pa na first time mo don tado ka, may iba ka na palang minilagro don. Pag ngayon ko naiisip parang gusto kitang bigwasan eh.🙃"},
+        {type:"img",src:"images/3rdpage/wias/4.jpg",caption:"This was the fifth. Pang apat yung nag punta ka sa bahay and bumili tayo ng hipon para gawing butter-garlic shrimp na hindi mo rin naman natikman. Wala tayong pic.😂 Anyways, nakikita mo na ba Dong kung gaano ka kalala? Pang limang kita pa lang natin nag aya ka na mag sogo! SOGO!!😭 at ang gaga, sumama din. Bobo yarn? HAHAHAHAHAHA gastos gastos ka pa wala din naman nangyare😆."},
+        {type:"img",src:"images/3rdpage/wias/5.jpg",caption:"This was the 6th time I've seen your fuckening face HAHAHAHAHA! Nag punta ka sa bahay. Tamang landian pa tayo niyan tas ayon nag away bago ka umuwi. May nabasa kasi ako sa messenger mong potragis ka.😃 In fairness, wala din akong masabi sa kalandian nating dalawa. Hindi pa tayo niyan pero kung ano anong eklabu na pinagagagawa natin.🤦🏻‍♀️"},
+        {type:"img",src:"images/3rdpage/wias/6.jpg",caption:"Then this is the 7th time. Madalas na tayo mag away niyan pero talagang hindi rin natin tinantanan pag mumukha ng isa't isa no? Piuntahan pa kita niyan sa billet niyo na hindi ko na nga alam ngayon bakit ko nga ba ginawa? HAHAHAAHAHA.😌 May dala pa 'kong gift sayo, sweet-sweet ko tas ano ginawa mo? nag aya ka lang mag MOTEL ulit!😃 at ang gagang nemal pumayag din ulit. Na para bang bigla kong na realize na kung may mag tatanong about sa love story natin mas maganda na itikom na lang ang mouth HAHSHAHAHAHA grabeng pacing 'to, boi! Pero again, wala pa din naman nangyare. Panixs.🥴"},
+        {type:"img",src:"images/3rdpage/wias/7.jpg",caption:"And finally, this was the last picture of us before we became official.🤦🏻‍♀️ Mag kaaway din tayo diyan. Parang 2days din ata tayong hindi nag usap. Tapos bigla ka nag chat sa tiktok sabi mo susunduin mo 'ko na para bang bati tayo! AT SUMAMA din naman ako ulit?!! Gusto din!😆 Grabe pala talaga karupok ko sayo, Dong. Lala😶 That was also the time na nameet mo si Mama HAHAHAHA. Anyways, 'yan na rin yung before ka bumalik sa taguig para sa graduation n'yo. Grats, Dol!😬"}
+      ],
+      monthly: [
+        {type:"img",src:"images/3rdpage/monthly/1.jpg",caption:"This was our first month being official.💗 Na sa taguig ka na niyan, umuwi ka lang saglit tapos kumain tayo sa labas.🎀"},
+        {type:"img",src:"images/3rdpage/monthly/2.jpg",caption:"2nd month.💖 Madalas nanaman tayo mag away pero infairness, na survive.😆"},
+        {type:"img",src:"images/3rdpage/monthly/3.jpg",caption:"Akalain mo 'yon, we reach 3rd month.💕 3 months ng away ng away HAHAHAHAHAHA!"},
+        {type:"img",src:"images/3rdpage/monthly/0.jpg",caption:"STAY TOGETHER TO UNLOCK!🤣"}
+      ],
+      random: [
+        {type:"video",src:"clips/3rdpage/random/1.mp4",caption:"🥰💖"},
+        {type:"video",src:"clips/3rdpage/random/2.mp4",caption:"💕💕💕"}
+      ],
+      celebrations: [
+        {type:"video",src:"clips/3rdpage/celebrations/1.mp4",caption:"MY KIO'S DAY!💖🎂"},
+        {type:"video",src:"clips/3rdpage/celebrations/2.mp4",caption:"HAPPY 28TH BIRTHDAY, POGIII. ILOVEYOUUU!💝"}
+      ],
+      favorite: [
+        {type:"img",src:"images/3rdpage/favorite/1.jpg",caption:"🥰💖"},
+        {type:"img",src:"images/3rdpage/favorite/2.jpg",caption:"💕💕💕"}
+      ]
+    };
+
+    const valentinesData = {
+      2026: [{type:"video",src:"clips/3rdpage/val/2026.mp4",caption:"Happy 1st Valentines, Pogi!💘"}],
+      2027: [{type:"img",src:"images/3rdpage/monthly/0.jpg",caption:"STAY TOGETHER TO UNLOCK!🤣"}],
+      2028: [{type:"img",src:"images/3rdpage/monthly/0.jpg",caption:"STAY TOGETHER TO UNLOCK!🤣"}]
+    };
+
+    function stopActiveMedia() {
+      const videos = mediaContainer.querySelectorAll("video");
+      videos.forEach((video) => {
+        video.pause();
+        video.currentTime = 0;
+      });
+    }
+
+    function setViewerOpen(isOpen) {
+      viewer.classList.toggle("active", isOpen);
+      viewer.setAttribute("aria-hidden", String(!isOpen));
+
+      if (!isOpen) {
+        stopActiveMedia();
+        mediaContainer.innerHTML = "";
+        caption.textContent = "";
+        viewerTitle.textContent = "Memory Viewer";
+        viewerBody.scrollTop = 0;
+        caption.scrollTop = 0;
+      }
+    }
+
+    function prettyTitle(name) {
+      const map = {
+        start: "Where it all started",
+        monthly: "Monthly Updates",
+        random: "Random Clips",
+        celebrations: "Celebrations",
+        favorite: "My Fav Pictures Of You",
+        valentines: "Valentines"
+      };
+      return map[name] || "Memory Viewer";
+    }
+
+    function openGallery(name) {
+      currentGalleryName = name;
+      currentGallery = galleries[name] || [];
+      currentIndex = 0;
+      viewerTitle.textContent = prettyTitle(name);
+      setViewerOpen(true);
+      showSlide();
+    }
+
+    function openValentines() {
+      currentGalleryName = "valentines";
+      currentGallery = [];
+      currentIndex = 0;
+      viewerTitle.textContent = "Valentines";
+      setViewerOpen(true);
+
+      mediaContainer.innerHTML = `
+        <div class="year-buttons">
+          <button type="button" data-year="2026">2026</button>
+          <button type="button" data-year="2027">2027</button>
+          <button type="button" data-year="2028">2028</button>
+        </div>
+      `;
+      caption.textContent = "Choose a year to open that Valentine memory. 💘";
+
+      mediaContainer.querySelectorAll("[data-year]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          loadVal(Number(btn.dataset.year));
+        });
+      });
+    }
+
+    function loadVal(year) {
+      currentGallery = valentinesData[year] || [];
+      currentIndex = 0;
+      viewerTitle.textContent = `Valentines ${year}`;
+      showSlide();
+    }
+
+    function showSlide() {
+      if (!currentGallery.length) return;
+
+      stopActiveMedia();
+      mediaContainer.innerHTML = "";
+      viewerBody.scrollTop = 0;
+      caption.scrollTop = 0;
+
+      const item = currentGallery[currentIndex];
+      let element;
+
+      if (item.type === "img") {
+        element = document.createElement("img");
+        element.alt = "Memory image";
+        element.loading = "eager";
+        element.decoding = "async";
+      } else {
+        element = document.createElement("video");
+        element.controls = true;
+        element.playsInline = true;
+        element.setAttribute("playsinline", "");
+        element.setAttribute("webkit-playsinline", "");
+        element.preload = "metadata";
+      }
+
+      element.src = item.src;
+      element.style.opacity = "0";
+      element.onerror = () => {
+        mediaContainer.innerHTML = `
+          <div style="
+            width:100%;
+            min-height:180px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            padding:20px;
+            border-radius:16px;
+            color:#d86c9c;
+            background:rgba(255,255,255,0.75);
+            box-shadow:0 8px 22px rgba(0,0,0,0.08);
+          ">
+            Missing file:<br>${item.src}
+          </div>
+        `;
+      };
+
+      mediaContainer.appendChild(element);
+
+      requestAnimationFrame(() => {
+        element.style.opacity = "1";
+      });
+
+      caption.textContent = item.caption || "";
+      prevBtn.style.opacity = currentIndex === 0 ? "0.55" : "1";
+      nextBtn.style.opacity = currentIndex === currentGallery.length - 1 ? "0.55" : "1";
+    }
+
+    function nextSlide() {
+      if (currentIndex < currentGallery.length - 1) {
+        currentIndex++;
+        showSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        showSlide();
+      }
+    }
+
+    function closeViewer() {
+      setViewerOpen(false);
+    }
+
+    function goToPage(url) {
+      if (isLeaving) return;
+      isLeaving = true;
+      screen.classList.add("fade-out");
+
+      setTimeout(() => {
+        window.location.href = url;
+      }, 850);
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener("click", () => {
+        const name = card.dataset.gallery;
+        if (name === "valentines") {
+          openValentines();
+        } else {
+          openGallery(name);
+        }
+      });
+    });
+
+    moreBtn.addEventListener("click", () => {
+      goToPage("4thpage.html");
+    });
+
+    backHubBtn.addEventListener("click", () => {
+      goToPage("hubpage.html");
+    });
+
+    prevBtn.addEventListener("click", prevSlide);
+    nextBtn.addEventListener("click", nextSlide);
+    closeBtn.addEventListener("click", closeViewer);
+
+    viewer.addEventListener("click", (e) => {
+      if (e.target === viewer) {
+        closeViewer();
+      }
+    });
+
+    viewer.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    viewer.addEventListener("touchend", (e) => {
+      const diffX = e.changedTouches[0].clientX - startX;
+      const diffY = e.changedTouches[0].clientY - startY;
+
+      const inCaption = e.target.closest && e.target.closest("#caption");
+      const captionAtTop = caption.scrollTop <= 2;
+
+      if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY)) {
+        diffX > 0 ? prevSlide() : nextSlide();
+        return;
+      }
+
+      if (diffY > 90 && Math.abs(diffY) > Math.abs(diffX)) {
+        if (!inCaption || captionAtTop) {
+          closeViewer();
+        }
+      }
+    }, { passive: true });
+
+    document.addEventListener("keydown", (e) => {
+      if (viewer.classList.contains("active")) {
+        if (e.key === "ArrowRight") nextSlide();
+        if (e.key === "ArrowLeft") prevSlide();
+        if (e.key === "Escape") closeViewer();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Game 1 — Kio Story Mission V3.0</title>
+  <link rel="stylesheet" href="game1-shared.css" />
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen">
+
+      <div class="topbar">
+        <div class="top-left">
+          <button id="goHubBtn">← Games</button>
+        </div>
+        <div class="top-right">
+          <button id="openStoreBtn">Store</button>
+        </div>
+      </div>
+
+      <div class="title-wrap">
+        <h1 class="page-title">Kio Story Mission</h1>
+        <p class="page-subtitle">Unlock a mission, gear up, and save the day. 💗</p>
+      </div>
+
+      <div class="select-layout">
+        <div class="missions-panel">
+          <div class="missions-grid" id="missionGrid"></div>
+        </div>
+
+        <div class="info-panel mission-info-panel">
+          <div class="info-avatar">
+            <img id="infoAvatar" alt="Mission Avatar" />
+          </div>
+
+          <div class="info-copy">
+            <h3 id="levelInfoTitle">Level Explanation</h3>
+
+            <div class="mission-detail-list">
+              <p><strong>Goal:</strong> <span id="levelGoal"></span></p>
+              <p><strong>Player:</strong> <span id="levelPlayer"></span></p>
+              <p><strong>Enemy:</strong> <span id="levelEnemy"></span></p>
+              <p><strong>Stats:</strong> <span id="levelStats"></span></p>
+              <p><strong>Store Access:</strong> <span id="levelUnlocks"></span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="start-panel">
+          <button id="startLevelBtn" class="start-btn">START MISSION</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="game1-shared.js"></script>
+  <script>
+    const state = window.game1State;
+
+    const el = {
+      missionGrid: document.getElementById("missionGrid"),
+      infoAvatar: document.getElementById("infoAvatar"),
+      levelInfoTitle: document.getElementById("levelInfoTitle"),
+      levelGoal: document.getElementById("levelGoal"),
+      levelPlayer: document.getElementById("levelPlayer"),
+      levelEnemy: document.getElementById("levelEnemy"),
+      levelStats: document.getElementById("levelStats"),
+      levelUnlocks: document.getElementById("levelUnlocks")
+    };
+
+    function updateTopInfo() {
+      const mission = getMission();
+      if (!mission) return;
+
+      const details = getMissionDetails(mission.level);
+
+      el.infoAvatar.src = mission.image;
+      el.levelInfoTitle.textContent = `${mission.name} — Level ${mission.level}`;
+      el.levelGoal.textContent = details.goal;
+      el.levelPlayer.textContent = details.player;
+      el.levelEnemy.textContent = details.enemies;
+      el.levelStats.textContent = details.stats;
+      el.levelUnlocks.textContent = details.unlocks;
+    }
+
+    function renderMissionCards() {
+      el.missionGrid.innerHTML = "";
+
+      state.missions.forEach((mission) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "mission-card";
+
+        if (mission.id === state.selectedMission) card.classList.add("selected");
+        if (!mission.unlocked) card.classList.add("locked");
+
+        card.innerHTML = `
+          <div class="mission-thumb">
+            <img src="${mission.image}" alt="${mission.name}">
+            ${!mission.unlocked ? '<div class="locked-badge">Locked</div>' : ""}
+          </div>
+          <div class="mission-name">${mission.name}</div>
+        `;
+
+        card.onclick = () => {
+          if (!mission.unlocked) return;
+
+          state.selectedMission = mission.id;
+          saveGame1State();
+          renderMissionCards();
+          updateTopInfo();
+        };
+
+        el.missionGrid.appendChild(card);
+      });
+
+      updateTopInfo();
+    }
+
+    document.getElementById("goHubBtn").onclick = () => {
+      window.location.href = "5thpage.html";
+    };
+
+    document.getElementById("openStoreBtn").onclick = () => {
+      saveGame1State();
+      window.location.href = "game1-store.html";
+    };
+
+    document.getElementById("startLevelBtn").onclick = () => {
+      saveGame1State();
+      window.location.href = "game1-ingame.html";
+    };
+
+    renderMissionCards();
+  </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!-- =========================
+     index.html
+     GitHub Pages entry point
+     - Option A (recommended): redirect to 1stpage.html
+     - Keeps your files unchanged, link opens your app immediately
+========================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LOVE TOKEN K&E</title>
+
+<!-- fast redirect -->
+<meta http-equiv="refresh" content="0; url=1stpage.html" />
+
+<style>
+  html,body{height:100%;margin:0}
+  body{
+    display:flex;align-items:center;justify-content:center;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:#000;color:#fff;letter-spacing:.3px;
+  }
+  .hint{opacity:.8;font-size:14px;text-align:center;padding:20px}
+  a{color:#ff9ecf}
+</style>
+</head>
+<body>
+  <div class="hint">
+    Opening <b>LOVE TOKEN K&amp;E</b>…<br><br>
+    If it doesn’t redirect, tap here: <a href="1stpage.html">Start</a>
+  </div>
+
+<script>
+  // JS redirect fallback (some browsers ignore meta refresh)
+  window.location.replace("1stpage.html");
+</script>
+</body>
+</html>

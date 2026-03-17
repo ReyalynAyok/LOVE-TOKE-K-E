@@ -1,0 +1,958 @@
+<!-- =========================
+   4thpage.html
+========================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Open When 💌</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --pink-main: #d86c9c;
+      --pink-deep: #c85a8d;
+      --pink-soft: #f48fb1;
+      --pink-light: #f8bbd0;
+      --text-soft: #b85f87;
+      --shadow-soft: 0 14px 32px rgba(216, 108, 156, 0.14);
+      --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.28);
+      --frame-radius: 50px;
+      --screen-radius: 40px;
+      --phone-width: min(390px, 94vw);
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #f1d8e1, #e8ccd8);
+      touch-action: manipulation;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button {
+      font-family: inherit;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.22s ease,
+        opacity 0.22s ease,
+        background 0.22s ease;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    .phone-frame {
+      width: var(--phone-width);
+      aspect-ratio: 390 / 844;
+      background: #000;
+      border-radius: var(--frame-radius);
+      padding: 12px;
+      box-shadow: var(--shadow-strong);
+      position: relative;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--screen-radius);
+      overflow: hidden;
+      position: relative;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      animation: appLaunch 0.72s ease-out;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.55), transparent 30%),
+        linear-gradient(180deg, #fff7fb, #ffeaf4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      isolation: isolate;
+    }
+
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    @keyframes appLaunch {
+      0% {
+        opacity: 0;
+        transform: scale(0.93);
+        filter: blur(8px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.015);
+        filter: blur(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .content {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding:
+        calc(env(safe-area-inset-top) + 38px)
+        16px
+        calc(env(safe-area-inset-bottom) + 22px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      z-index: 2;
+      scrollbar-width: none;
+      min-height: 0;
+    }
+
+    .content::-webkit-scrollbar {
+      display: none;
+    }
+
+    .topbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .back-hub-btn,
+    .mini-pill {
+      min-height: 36px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--pink-main);
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(216, 108, 156, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .mini-pill {
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    h2 {
+      color: var(--pink-main);
+      font-size: 21px;
+      margin: 0 0 8px;
+      text-align: center;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      color: var(--text-soft);
+      opacity: 0.88;
+      font-size: 12.5px;
+      margin: 0 0 18px;
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .letters {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .envelope {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.68);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-soft);
+      color: var(--text-soft);
+      text-align: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      animation: floatCard 6s ease-in-out infinite;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .envelope::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.72), transparent 38%),
+        linear-gradient(180deg, rgba(255,255,255,0.12), rgba(244,143,177,0.06));
+      pointer-events: none;
+    }
+
+    .envelope span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .envelope:nth-child(2) { animation-delay: 0.5s; }
+    .envelope:nth-child(3) { animation-delay: 1s; }
+    .envelope:nth-child(4) { animation-delay: 1.5s; }
+    .envelope:nth-child(5) { animation-delay: 2s; }
+
+    .envelope:active {
+      transform: scale(0.985);
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .more-love-btn {
+      margin-top: 18px;
+      padding: 12px 28px;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #ff6fa5, #f48fb1);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.34);
+      animation: glowPulse 2s infinite alternate;
+    }
+
+    @keyframes glowPulse {
+      from { box-shadow: 0 0 15px rgba(255, 105, 180, 0.3); }
+      to { box-shadow: 0 0 26px rgba(255, 105, 180, 0.55); }
+    }
+
+    .lock-wrap {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lock-icon {
+      font-size: 30px;
+      transition: transform 0.25s ease;
+      padding: 10px 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 10px 18px rgba(204, 92, 143, 0.14);
+      user-select: none;
+    }
+
+    .lock-icon:active {
+      transform: scale(0.96);
+    }
+
+    .lock-icon.clicked {
+      animation: tilt 0.4s;
+    }
+
+    .lock-note {
+      color: var(--text-soft);
+      font-size: 11.5px;
+      opacity: 0.86;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    @keyframes tilt {
+      0% { transform: rotate(0); }
+      30% { transform: rotate(-15deg); }
+      60% { transform: rotate(10deg); }
+      100% { transform: rotate(0); }
+    }
+
+    .modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 30;
+      overflow: auto;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      width: 100%;
+      max-width: 320px;
+      max-height: min(82vh, 700px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 22px;
+      border-radius: 25px;
+      text-align: center;
+      color: var(--text-soft);
+      box-shadow: 0 25px 50px rgba(204, 92, 143, 0.24);
+      animation: pop 0.35s ease;
+      scrollbar-width: none;
+    }
+
+    .modal-box::-webkit-scrollbar {
+      display: none;
+    }
+
+    @keyframes pop {
+      from {
+        transform: scale(0.86);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .letter-text {
+      font-size: 14px;
+      line-height: 1.68;
+      text-align: left;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .modal-title {
+      margin: 0 0 14px;
+      color: var(--pink-main);
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .close-btn,
+    .quiz-btn {
+      margin-top: 14px;
+      width: 100%;
+      padding: 11px;
+      border-radius: 25px;
+      background: linear-gradient(45deg, #ff6fa5, #f48fb1);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 0 15px rgba(255, 105, 180, 0.32);
+    }
+
+    .quiz-btn.secondary {
+      background: rgba(248, 187, 208, 0.95);
+      color: white;
+      box-shadow: none;
+    }
+
+    .quiz-box {
+      text-align: left;
+    }
+
+    .quiz-box h3 {
+      text-align: center;
+      margin-top: 0;
+      color: var(--pink-main);
+      line-height: 1.45;
+      font-size: 17px;
+    }
+
+    .quiz-box p {
+      margin: 12px 0 8px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .quiz-field {
+      margin: 0 0 12px;
+      width: 100%;
+    }
+
+    .quiz-field input {
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(204, 92, 143, 0.35);
+      background: #fff;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .quiz-field input:focus {
+      border-color: #ff6fa5;
+      box-shadow: 0 0 0 3px rgba(255, 111, 165, 0.16);
+    }
+
+    .error {
+      color: #e45a75;
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+      line-height: 1.45;
+      animation: shake 0.4s;
+    }
+
+    .lock-timer {
+      margin-top: 8px;
+      color: var(--pink-main);
+      font-size: 12px;
+      text-align: center;
+      opacity: 0.9;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .red-flash {
+      animation: redFlash 1s infinite;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #fff5f7;
+    }
+
+    @keyframes redFlash {
+      0%, 100% { background: #fff5f7; }
+      50% { background: #ffd6d6; }
+    }
+
+    .key-result {
+      text-align: center;
+    }
+
+    .key-result h3 {
+      margin: 0 0 12px;
+      color: var(--pink-main);
+    }
+
+    .secret-key {
+      color: #ff6fa5;
+      text-align: center;
+      font-size: 25px;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: sparkleAnim 3s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes sparkleAnim {
+      0% { opacity: 0; transform: scale(0.7); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0; transform: scale(0.8); }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.85s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(1.03);
+      }
+    }
+
+    @media (max-width: 500px) {
+      html,
+      body {
+        background: #000;
+      }
+
+      body {
+        width: 100vw;
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+      }
+
+      .phone-frame {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        aspect-ratio: auto;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .phone-screen {
+        border-radius: 0;
+      }
+
+      .notch {
+        display: none;
+      }
+    }
+
+    @media (max-height: 720px) {
+      .content {
+        padding-top: calc(env(safe-area-inset-top) + 34px);
+      }
+
+      h2 {
+        font-size: 19px;
+        margin-bottom: 6px;
+      }
+
+      .subtitle {
+        margin-bottom: 14px;
+      }
+
+      .envelope {
+        padding: 13px 14px;
+        font-size: 13px;
+      }
+
+      .more-love-btn {
+        margin-top: 14px;
+      }
+
+      .modal-box {
+        padding: 18px;
+        border-radius: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen" id="screen">
+      <div class="notch"></div>
+
+      <div class="content">
+        <div class="topbar">
+          <button class="back-hub-btn" id="backHubBtn" type="button">← Hub</button>
+          <div class="mini-pill">Letters</div>
+        </div>
+
+        <h2>Click me... 💌</h2>
+        <p class="subtitle">Little letters for different moments, only for you.</p>
+
+        <div class="letters">
+          <button class="envelope" type="button" data-letter="sad"><span>☹️ When you're sad</span></button>
+          <button class="envelope" type="button" data-letter="fight"><span>🥺 If we are fighting..</span></button>
+          <button class="envelope" type="button" data-letter="miss"><span>🤍 When you miss me</span></button>
+          <button class="envelope" type="button" data-letter="happy"><span>🥰 If you're happy</span></button>
+          <button class="envelope" type="button" data-letter="proud"><span>💗 When you feel proud</span></button>
+        </div>
+
+        <button class="more-love-btn" id="moreLoveBtn" type="button">
+          Wanna play some games?🫣
+        </button>
+
+        <div class="lock-wrap">
+          <div class="lock-icon" id="lockIcon" role="button" tabindex="0" aria-label="Open quiz">🔒</div>
+          <div class="lock-note">Secret quiz for Eya's inner thoughts 🔑</div>
+        </div>
+      </div>
+
+      <div class="modal" id="letterModal" aria-hidden="true">
+        <div class="modal-box" id="letterContent"></div>
+      </div>
+
+      <div class="modal" id="quizModal" aria-hidden="true">
+        <div class="modal-box quiz-box" id="quizBox">
+          <h3>Answer correctly to get the key for Eya's inner thoughts.🔑</h3>
+
+          <form id="quizForm">
+            <p>1. Ilang beses ka nakapunta sa bahay nung hindi pa tayo😂?</p>
+            <div class="quiz-field">
+              <input type="text" name="q1" autocomplete="off" placeholder="Type your answer..." />
+            </div>
+
+            <p>2. What's my favorite color?🤨</p>
+            <div class="quiz-field">
+              <input type="text" name="q2" autocomplete="off" placeholder="Type your answer..." />
+            </div>
+
+            <p>3. Who's Eya's favorite person🧐</p>
+            <div class="quiz-field">
+              <input type="text" name="q3" autocomplete="off" placeholder="Type your answer..." />
+            </div>
+
+            <p>4. Where was our last date before we became official?😙</p>
+            <div class="quiz-field">
+              <input type="text" name="q4" autocomplete="off" placeholder="Type your answer..." />
+            </div>
+
+            <p>5. What are my nicknames for you?😋</p>
+            <div class="quiz-field">
+              <input type="text" name="q5" autocomplete="off" placeholder="Type your answer..." />
+            </div>
+
+            <button type="button" class="quiz-btn" id="submitQuizBtn">SUBMIT</button>
+            <button type="button" class="quiz-btn secondary" id="closeQuizBtn">BACK</button>
+
+            <div id="quizError"></div>
+            <div id="lockTimer" class="lock-timer"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const letters = {
+      sad: "Hi, Pogi. If today feels a little heavy and you don’t know why, that’s okay. You don’t have to figure everything out right now. Just breathe for a moment, oki? You’re doing okay. It's just, sometimes the heart really feels tired without a reason so,.. be gentle with yourself. This moment will pass. It always does, Kio. Iloveyou.💖",
+      fight: "If you’re reading this while we’re not okay, I just want you to know that even when we argue or misunderstand each other, my feelings for you haven’t changed. I may get upset, and you may too, but at the end of the day, you’re still the person I care about and choose, and I hope... we always find our way back to each other.🥺",
+      miss: "Hi, Baby… I just want you to know I’m probably missing you too, maybe even more than you think. Even when we’re apart, a part of me is always quietly thinking about you. So wherever you are, please know that you’re loved more than words can explain.❤️",
+      happy: "Hi, Pogi. I hope your day keeps going the same way, full of small wins and quiet happiness—keep that smile for me a little longer. I hope whatever is making your day brighter right now stays with you, and just remember that somewhere out there, there’s someone who loves seeing you this way.💗",
+      proud: "Hello, Dudong! If you clicked this while feeling proud, then let me say it too: I’m proud of you! Not just for what you accomplished today, but for the strength, patience, and effort you put into becoming the person you are.💕"
+    };
+
+    const acceptedAnswers = {
+      q1: ["2", "dalawa", "two"],
+      q2: ["green"],
+      q3: ["john kent g paguntalan", "kio", "john kent", "kent"],
+      q4: ["burger king", "burgerking"],
+      q5: ["kuya pags", "indoy", "dudoy", "dudong", "pogi"]
+    };
+
+    const LOCK_STORAGE_KEY = "ltk_quiz_locked_until";
+    const LOCK_DURATION_MS = 180000;
+
+    const screen = document.getElementById("screen");
+    const letterModal = document.getElementById("letterModal");
+    const quizModal = document.getElementById("quizModal");
+    const letterContent = document.getElementById("letterContent");
+    const quizBox = document.getElementById("quizBox");
+    const quizForm = document.getElementById("quizForm");
+    const quizError = document.getElementById("quizError");
+    const lockTimer = document.getElementById("lockTimer");
+    const lockIcon = document.getElementById("lockIcon");
+    const moreLoveBtn = document.getElementById("moreLoveBtn");
+    const submitQuizBtn = document.getElementById("submitQuizBtn");
+    const closeQuizBtn = document.getElementById("closeQuizBtn");
+    const backHubBtn = document.getElementById("backHubBtn");
+    const envelopeButtons = document.querySelectorAll(".envelope");
+
+    let sparkleTimer = null;
+    let countdownTimer = null;
+    let isLeaving = false;
+
+    function normalizeAnswer(str) {
+      return (str || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[.,!?:;"'()]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function setModalOpen(modal, isOpen) {
+      modal.classList.toggle("active", isOpen);
+      modal.setAttribute("aria-hidden", String(!isOpen));
+    }
+
+    function goToPage(url) {
+      if (isLeaving) return;
+      isLeaving = true;
+      screen.classList.add("fade-out");
+
+      setTimeout(() => {
+        window.location.href = url;
+      }, 850);
+    }
+
+    function openLetter(type) {
+      letterContent.innerHTML = `
+        <h3 class="modal-title">Open When 💌</h3>
+        <p class="letter-text">${letters[type]}</p>
+        <button class="close-btn" type="button" id="closeLetterBtn">Close</button>
+      `;
+      setModalOpen(letterModal, true);
+
+      document.getElementById("closeLetterBtn").addEventListener("click", closeLetter);
+    }
+
+    function closeLetter() {
+      setModalOpen(letterModal, false);
+    }
+
+    function getLockedUntil() {
+      return Number(localStorage.getItem(LOCK_STORAGE_KEY) || 0);
+    }
+
+    function setLockedUntil(value) {
+      localStorage.setItem(LOCK_STORAGE_KEY, String(value));
+    }
+
+    function clearLock() {
+      localStorage.removeItem(LOCK_STORAGE_KEY);
+    }
+
+    function formatRemaining(ms) {
+      const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function updateLockUI() {
+      const now = Date.now();
+      const lockedUntil = getLockedUntil();
+
+      if (lockedUntil > now) {
+        const remaining = lockedUntil - now;
+        lockTimer.textContent = `Try again in ${formatRemaining(remaining)}`;
+        submitQuizBtn.disabled = true;
+        submitQuizBtn.style.opacity = "0.6";
+      } else {
+        lockTimer.textContent = "";
+        submitQuizBtn.disabled = false;
+        submitQuizBtn.style.opacity = "1";
+        if (lockedUntil) clearLock();
+      }
+    }
+
+    function startCountdown() {
+      stopCountdown();
+      updateLockUI();
+
+      countdownTimer = setInterval(() => {
+        updateLockUI();
+        if (!getLockedUntil()) {
+          stopCountdown();
+        }
+      }, 1000);
+    }
+
+    function stopCountdown() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+    }
+
+    function openQuiz() {
+      lockIcon.classList.add("clicked");
+      setTimeout(() => lockIcon.classList.remove("clicked"), 400);
+
+      setModalOpen(quizModal, true);
+      updateLockUI();
+
+      if (getLockedUntil() > Date.now()) {
+        startCountdown();
+      }
+
+      const firstInput = quizForm.querySelector("input");
+      setTimeout(() => firstInput?.focus(), 150);
+    }
+
+    function closeQuiz() {
+      setModalOpen(quizModal, false);
+    }
+
+    function showQuizSuccess() {
+      quizBox.innerHTML = `
+        <div class="key-result">
+          <h3>Your Key is:</h3>
+          <h2 class="secret-key">ILOVEKIOSOMUCHHH!</h2>
+          <button class="quiz-btn" type="button" id="goHiddenBtn">
+            Go to Hidden Envelope 💌
+          </button>
+          <button class="quiz-btn secondary" type="button" id="backFromSuccessBtn">
+            Back
+          </button>
+        </div>
+      `;
+
+      document.getElementById("goHiddenBtn").addEventListener("click", () => {
+        goToPage("hiddenpage.html");
+      });
+
+      document.getElementById("backFromSuccessBtn").addEventListener("click", closeQuiz);
+    }
+
+    function clearQuizInputs() {
+      quizForm.querySelectorAll('input[type="text"]').forEach((input) => {
+        input.value = "";
+      });
+    }
+
+    function submitQuiz() {
+      const now = Date.now();
+      const lockedUntil = getLockedUntil();
+
+      if (now < lockedUntil) {
+        updateLockUI();
+        startCountdown();
+        return;
+      }
+
+      let correct = true;
+
+      for (const key in acceptedAnswers) {
+        const input = quizForm.querySelector(`input[name="${key}"]`);
+        const user = normalizeAnswer(input?.value);
+        let ok = false;
+
+        if (key === "q5") {
+          ok = acceptedAnswers.q5.some((ans) => user.includes(normalizeAnswer(ans)));
+        } else {
+          ok = acceptedAnswers[key].some((ans) => normalizeAnswer(ans) === user);
+        }
+
+        if (!ok) {
+          correct = false;
+          break;
+        }
+      }
+
+      if (correct) {
+        quizError.innerHTML = "";
+        lockTimer.textContent = "";
+        clearLock();
+        stopCountdown();
+        showQuizSuccess();
+      } else {
+        const nextLock = Date.now() + LOCK_DURATION_MS;
+        setLockedUntil(nextLock);
+        clearQuizInputs();
+
+        quizError.innerHTML = `
+          <div class="error red-flash">
+            SEEMS LIKE HINDI PA TIME PARA MABASA MO 'TO, BY.😅
+          </div>
+        `;
+
+        updateLockUI();
+        startCountdown();
+      }
+    }
+
+    function createSparkle() {
+      const s = document.createElement("div");
+      s.className = "sparkle";
+      s.style.top = Math.random() * 100 + "%";
+      s.style.left = Math.random() * 100 + "%";
+      screen.appendChild(s);
+
+      setTimeout(() => s.remove(), 3000);
+    }
+
+    function startSparkles() {
+      if (sparkleTimer) return;
+      sparkleTimer = setInterval(createSparkle, 800);
+    }
+
+    function stopSparkles() {
+      if (!sparkleTimer) return;
+      clearInterval(sparkleTimer);
+      sparkleTimer = null;
+    }
+
+    envelopeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        openLetter(btn.dataset.letter);
+      });
+    });
+
+    moreLoveBtn.addEventListener("click", () => {
+      goToPage("5thpage.html");
+    });
+
+    backHubBtn.addEventListener("click", () => {
+      goToPage("hubpage.html");
+    });
+
+    lockIcon.addEventListener("click", openQuiz);
+    lockIcon.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openQuiz();
+      }
+    });
+
+    submitQuizBtn.addEventListener("click", submitQuiz);
+    closeQuizBtn.addEventListener("click", closeQuiz);
+
+    letterModal.addEventListener("click", (e) => {
+      if (e.target === letterModal) closeLetter();
+    });
+
+    quizModal.addEventListener("click", (e) => {
+      if (e.target === quizModal) closeQuiz();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (quizModal.classList.contains("active")) closeQuiz();
+        if (letterModal.classList.contains("active")) closeLetter();
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopSparkles();
+      } else {
+        startSparkles();
+      }
+    });
+
+    startSparkles();
+    updateLockUI();
+
+    if (getLockedUntil() > Date.now()) {
+      startCountdown();
+    }
+  </script>
+</body>
+</html>

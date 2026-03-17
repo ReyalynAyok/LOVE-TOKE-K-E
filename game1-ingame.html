@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Game 1 In-Game — LOVE TOKEN K&E</title>
+  <link rel="stylesheet" href="game1-shared.css" />
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen" id="screen">
+
+      <div class="topbar game-topbar">
+        <div class="top-left">
+          <button id="buyBtn">🛒 Buy</button>
+          <button id="backToMenuBtn">← Menu</button>
+        </div>
+        <div class="top-right">
+          <button id="restartTopBtn">Restart</button>
+        </div>
+      </div>
+
+      <div class="title-wrap game-title">
+        <h1>Shoot The Enemies</h1>
+        <p id="gameSubtitle">Beat the timer and clear all enemies before bullets run out.</p>
+      </div>
+
+      <div class="hud-strip" id="hudStrip">
+        <div class="hud-tag">Level <strong id="hudLevel">1</strong></div>
+        <div class="hud-tag">Points <strong id="hudPoints">0</strong></div>
+        <div class="hud-tag">Kills <strong><span id="hudKills">0</span>/<span id="hudTargetKills">0</span></strong></div>
+        <div class="hud-tag">Time <strong id="hudTimer">60s</strong></div>
+        <div class="hud-tag">Weapon <strong id="hudWeapon">Gun</strong></div>
+        <div class="hud-tag">Bullets <strong id="hudBullets">10</strong></div>
+        <div class="hud-tag">Misses <strong><span id="hudMisses">0</span>/<span id="hudMissLimit">0</span></strong></div>
+        <div class="hud-tag">Life <strong id="hudLives">—</strong></div>
+        <div class="hud-tag">Vest <strong id="hudVest">—</strong></div>
+        <div class="hud-tag">Hooks <strong id="hudHooks">0</strong></div>
+        <div class="hud-tag">Saved <strong><span id="hudSaved">0</span>/<span id="hudSavedTarget">0</span></strong></div>
+      </div>
+
+      <div class="arena-wrap">
+        <div class="arena" id="arena">
+          <div class="arena-bg">
+            <img id="arenaBgImg" alt="Arena Background" />
+          </div>
+
+          <div class="notice" id="notice"></div>
+          <div class="safe-zone" id="safeZone">SAFE ZONE</div>
+
+          <div class="player" id="player">
+            <img id="playerImg" alt="Player" />
+          </div>
+
+          <div class="crosshair" id="crosshair"></div>
+          <div class="aim-line" id="aimLine"></div>
+          <div class="radial-wheel" id="radialWheel"></div>
+        </div>
+      </div>
+
+      <div class="overlay" id="overlay">
+        <div class="modal">
+          <h2 id="overlayTitle"></h2>
+          <p id="overlayText"></p>
+          <div class="modal-actions">
+            <button id="overlayPrimary">Continue</button>
+            <button id="overlaySecondary">Back</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="game1-shared.js"></script>
+  <script>
+    const state = window.game1State;
+
+    const SOUND = {
+      gun: null,
+      knife: null,
+      bomb: null
+    };
+
+    const IMAGE_PATHS = {
+      bloodSplash: "images/games/game1/enemies/blood.png",
+      bloodParticle: "images/games/game1/enemies/blood.png"
+    };
+
+    const el = {
+      arena: document.getElementById("arena"),
+      player: document.getElementById("player"),
+      radialWheel: document.getElementById("radialWheel"),
+      safeZone: document.getElementById("safeZone"),
+      crosshair: document.getElementById("crosshair"),
+      aimLine: document.getElementById("aimLine"),
+      notice: document.getElementById("notice"),
+      arenaBgImg: document.getElementById("arenaBgImg"),
+      playerImg: document.getElementById("playerImg"),
+      gameSubtitle: document.getElementById("gameSubtitle"),
+      overlay: document.getElementById("overlay"),
+      overlayTitle: document.getElementById("overlayTitle"),
+      overlayText: document.getElementById("overlayText"),
+      overlayPrimary: document.getElementById("overlayPrimary"),
+      overlaySecondary: document.getElementById("overlaySecondary")
+    };
+
+    function playSound(type) {
+      if (!SOUND[type]) return;
+      SOUND[type].currentTime = 0;
+      SOUND[type].play().catch(() => {});
+    }
+
+    function getArenaRect() {
+      return el.arena.getBoundingClientRect();
+    }
+
+    function getSafeZoneRectInArena() {
+      return {
+        x: el.safeZone.offsetLeft,
+        y: el.safeZone.offsetTop,
+        width: el.safeZone.offsetWidth,
+        height: el.safeZone.offsetHeight
+      };
+    }
+
+    function flashNotice(text) {
+      el.notice.textContent = text;
+      el.notice.classList.add("show");
+
+      clearTimeout(flashNotice._timer);
+      flashNotice._timer = setTimeout(() => {
+        el.notice.classList.remove("show");
+      }, 1200);
+    }
+
+    function clearArena() {
+      el.arena.querySelectorAll(
+        ".entity,.enemy-bullet,.blast,.blood-splash,.blood-particle,.floating-msg,.points-pop,.hook-line,.muzzle"
+      ).forEach((node) => node.remove());
+    }
+
+    function createEntity(x, y, src, label, extraClass = "") {
+      const node = document.createElement("div");
+      node.className = `entity ${extraClass}`.trim();
+      node.style.left = x + "px";
+      node.style.top = y + "px";
+      node.innerHTML = `
+        <img src="${src}" alt="${label}">
+        <div class="label">${label}</div>
+      `;
+      el.arena.appendChild(node);
+      return node;
+    }
+
+    function spawnBloodEffect(x, y) {
+      const splash = document.createElement("div");
+      splash.className = "blood-splash";
+      splash.style.left = x + "px";
+      splash.style.top = y + "px";
+      splash.innerHTML = `<img src="${IMAGE_PATHS.bloodSplash}" alt="blood">`;
+      el.arena.appendChild(splash);
+      setTimeout(() => splash.remove(), 850);
+
+      for (let i = 0; i < 7; i++) {
+        const p = document.createElement("div");
+        p.className = "blood-particle";
+        p.style.left = x + "px";
+        p.style.top = y + "px";
+        p.innerHTML = `<img src="${IMAGE_PATHS.bloodParticle}" alt="blood">`;
+        el.arena.appendChild(p);
+
+        const dx = rand(-24, 24);
+        const dy = rand(-20, 20);
+
+        p.animate(
+          [
+            { transform: "translate(-50%,-50%) scale(.8)", opacity: 1 },
+            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)`, opacity: 0 }
+          ],
+          { duration: 680, easing: "ease-out", fill: "forwards" }
+        );
+
+        setTimeout(() => p.remove(), 700);
+      }
+    }
+
+    function floatText(x, y, text, cls) {
+      const node = document.createElement("div");
+      node.className = cls;
+      node.textContent = text;
+      node.style.left = x + "px";
+      node.style.top = y + "px";
+      el.arena.appendChild(node);
+      setTimeout(() => node.remove(), 700);
+    }
+
+    function spawnMuzzle(x, y) {
+      const node = document.createElement("div");
+      node.className = "muzzle";
+      node.style.left = x + "px";
+      node.style.top = y + "px";
+      node.style.opacity = "1";
+      el.arena.appendChild(node);
+      setTimeout(() => node.remove(), 120);
+    }
+
+    function updateHUD() {
+      if (!state.game) return;
+
+      document.getElementById("hudLevel").textContent = state.game.level;
+      document.getElementById("hudPoints").textContent = state.points;
+      document.getElementById("hudKills").textContent = state.game.kills;
+      document.getElementById("hudTargetKills").textContent = state.game.enemyTarget;
+      document.getElementById("hudTimer").textContent = formatTime(state.game.timeLeft);
+      document.getElementById("hudWeapon").textContent = getItem(state.equipped)?.name || "—";
+      document.getElementById("hudBullets").textContent = state.game.bullets;
+      document.getElementById("hudMisses").textContent = state.game.misses;
+      document.getElementById("hudMissLimit").textContent = state.game.missLimit === 999 ? "∞" : state.game.missLimit;
+      document.getElementById("hudLives").textContent = state.game.level >= 4 ? state.game.lives : "—";
+      document.getElementById("hudVest").textContent = state.inventory.vest ? "✓" : "—";
+      document.getElementById("hudHooks").textContent = state.game.level >= 4 ? state.game.hookCharges : 0;
+      document.getElementById("hudSaved").textContent = state.game.savedCount;
+      document.getElementById("hudSavedTarget").textContent = state.game.targetSaved;
+    }
+
+    function acquireVest() {
+      state.inventory.vest = true;
+      saveGame1State();
+      flashNotice("Vest acquired");
+      updateHUD();
+    }
+
+    function playerHit() {
+      if (state.inventory.vest) {
+        state.inventory.vest = false;
+        saveGame1State();
+        flashNotice("Vest saved you");
+        updateHUD();
+        return;
+      }
+
+      state.game.lives--;
+
+      if (state.game.lives <= 0) {
+        endMission(false, "You lost all lives");
+        return;
+      }
+
+      updateHUD();
+    }
+
+    function registerMiss() {
+      state.game.misses++;
+      floatText(state.game.pointer.x, state.game.pointer.y, "MISS", "floating-msg");
+
+      if (state.game.missLimit < 999 && state.game.misses > state.game.missLimit) {
+        endMission(false, "Too many missed shots");
+        return;
+      }
+
+      if (state.game.bullets <= 0 && state.game.kills < state.game.enemyTarget) {
+        endMission(false, "You ran out of bullets");
+        return;
+      }
+
+      updateHUD();
+    }
+
+    function getCurrentItem() {
+      return getItem(state.equipped);
+    }
+
+    function getGunHitLimit(item) {
+      if (!item) return 1;
+      if (item.id === "gun2") return 3;
+      if (item.id === "gun3") return 5;
+      return 1;
+    }
+
+    function getKnifeHitLimit(item) {
+      if (!item) return 0;
+      return item.id === "knife2" ? 3 : 2;
+    }
+
+    function useAmmo(item) {
+      if (!item || item.quantity <= 0) {
+        flashNotice("No ammo left");
+        return false;
+      }
+
+      item.quantity--;
+      state.game.bullets += item.amount;
+      saveGame1State();
+      renderWheel();
+      updateHUD();
+      flashNotice(`${item.name} used`);
+      return true;
+    }
+
+    function useVestItem(item) {
+      if (!item || item.quantity <= 0) {
+        flashNotice("No vest left");
+        return false;
+      }
+
+      if (state.inventory.vest) {
+        flashNotice("Vest already active");
+        return false;
+      }
+
+      item.quantity--;
+      state.inventory.vest = true;
+      saveGame1State();
+      renderWheel();
+      updateHUD();
+      flashNotice("Vest equipped");
+      return true;
+    }
+
+    function getWheelEntries() {
+      const level = state.game.level;
+      const entries = [];
+
+      state.items.forEach((item) => {
+        if (!itemAllowedForMission(item, level)) return;
+
+        if (item.id === "hook" && level >= 4) {
+          entries.push({
+            item,
+            quantity: state.game.hookCharges,
+            disabled: state.game.hookCharges <= 0
+          });
+          return;
+        }
+
+        if (item.type === "weapon" && !isConsumable(item) && item.owned) {
+          entries.push({
+            item,
+            quantity: Infinity,
+            disabled: false
+          });
+          return;
+        }
+
+        if (isConsumable(item) && item.owned) {
+          entries.push({
+            item,
+            quantity: item.quantity || 0,
+            disabled: (item.quantity || 0) <= 0
+          });
+        }
+      });
+
+      return entries;
+    }
+
+    function positionPlayer() {
+      if (!state.game) return;
+      el.player.style.left = state.game.playerX + "px";
+      el.player.style.top = state.game.playerY + "px";
+    }
+
+    function positionCrosshair() {
+      if (!state.game) return;
+
+      el.crosshair.style.left = state.game.pointer.x + "px";
+      el.crosshair.style.top = state.game.pointer.y + "px";
+
+      const startX = state.game.playerX;
+      const startY = state.game.playerY - 14;
+      const dx = state.game.pointer.x - startX;
+      const dy = state.game.pointer.y - startY;
+      const length = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      el.aimLine.style.left = startX + "px";
+      el.aimLine.style.top = startY + "px";
+      el.aimLine.style.width = Math.max(10, length - 16) + "px";
+      el.aimLine.style.transform = `rotate(${angle}deg)`;
+    }
+
+    function positionWheel() {
+      if (!state.game) return;
+
+      const wheel = el.radialWheel;
+      const wheelSize = wheel.offsetWidth || 138;
+      const rect = getArenaRect();
+
+      let left = state.game.playerX - wheelSize - 12;
+      let top = state.game.playerY - wheelSize * 0.64;
+
+      left = clamp(left, 8, rect.width - wheelSize - 8);
+
+      if (state.game.level >= 4) {
+        top = clamp(state.game.playerY - wheelSize * 0.62, 78, rect.height - wheelSize - 8);
+      } else {
+        top = rect.height - wheelSize - 8;
+      }
+
+      wheel.style.left = left + "px";
+      wheel.style.top = top + "px";
+    }
+
+    function renderWheel() {
+      const wheel = el.radialWheel;
+      const entries = getWheelEntries();
+
+      wheel.innerHTML = "";
+
+      if (!state.game || !entries.length) {
+        wheel.classList.remove("show");
+        return;
+      }
+
+      wheel.classList.add("show");
+
+      const rotation = state.game.wheelRotation || 0;
+      const radius = entries.length <= 1 ? 0 : 50;
+      const center = 69;
+      const step = entries.length <= 1 ? 0 : (Math.PI * 2) / entries.length;
+
+      entries.forEach((entry, i) => {
+        const angle = -Math.PI / 2 + (i * step) + rotation;
+        const x = center + Math.cos(angle) * radius;
+        const y = center + Math.sin(angle) * radius;
+
+        const slot = document.createElement("div");
+        slot.className = "wheel-slot";
+        if (entry.disabled) slot.classList.add("disabled");
+        if (state.equipped === entry.item.id) slot.classList.add("active");
+
+        slot.style.left = x + "px";
+        slot.style.top = y + "px";
+        slot.innerHTML = `<img src="${entry.item.image}" alt="${entry.item.name}">`;
+
+        if (entry.quantity !== Infinity) {
+          const count = document.createElement("div");
+          count.className = "wheel-count";
+          count.textContent = entry.quantity;
+          slot.appendChild(count);
+        }
+
+        slot.onclick = (ev) => {
+          ev.stopPropagation();
+          if (entry.disabled) return;
+          state.equipped = entry.item.id;
+          saveGame1State();
+          renderWheel();
+          updateHUD();
+        };
+
+        wheel.appendChild(slot);
+      });
+
+      const centerIcon = document.createElement("div");
+      centerIcon.className = "wheel-center";
+      centerIcon.innerHTML = `<img src="${getItem(state.equipped)?.image || getItem("gun1").image}" alt="Current item">`;
+      wheel.appendChild(centerIcon);
+
+      const label = document.createElement("div");
+      label.className = "wheel-label";
+      label.textContent = getItem(state.equipped)?.name || "Weapon";
+      wheel.appendChild(label);
+
+      positionWheel();
+    }
+
+    function updatePointerFromEvent(ev) {
+      if (!state.game) return;
+      const rect = getArenaRect();
+      state.game.pointer.x = clamp(ev.clientX - rect.left, 22, rect.width - 22);
+      state.game.pointer.y = clamp(ev.clientY - rect.top, 22, rect.height - 22);
+      positionCrosshair();
+    }
+
+    function getShootTargets(limit) {
+      const alive = state.game.enemies.filter((enemy) => enemy.alive);
+      if (!alive.length) return [];
+
+      const pointerX = state.game.pointer.x;
+      const pointerY = state.game.pointer.y;
+
+      return alive
+        .map((enemy) => ({
+          enemy,
+          pointerDistance: dist(enemy.x, enemy.y, pointerX, pointerY),
+          laneOffset: Math.abs(enemy.y - pointerY)
+        }))
+        .filter((entry) => entry.pointerDistance <= 118 || entry.laneOffset <= 54)
+        .sort((a, b) => {
+          if (a.pointerDistance !== b.pointerDistance) return a.pointerDistance - b.pointerDistance;
+          return a.laneOffset - b.laneOffset;
+        })
+        .slice(0, limit)
+        .map((entry) => entry.enemy);
+    }
+
+    function killEnemy(enemy) {
+      if (!enemy.alive) return;
+
+      enemy.alive = false;
+      enemy.node.classList.add("dead");
+      setTimeout(() => enemy.node.remove(), 180);
+
+      spawnBloodEffect(enemy.x, enemy.y);
+
+      state.game.kills++;
+      state.points += 5;
+      saveGame1State();
+
+      floatText(enemy.x, enemy.y, "+5", "points-pop");
+
+      if (enemy.special) {
+        acquireVest();
+      }
+
+      updateHUD();
+      checkWin();
+    }
+
+    function shootGun() {
+      if (state.game.bullets <= 0) {
+        endMission(false, "You ran out of bullets");
+        return;
+      }
+
+      const item = getCurrentItem();
+      const hitLimit = getGunHitLimit(item);
+
+      playSound("gun");
+      state.game.bullets--;
+      spawnMuzzle(state.game.playerX, state.game.playerY - 16);
+
+      const targets = getShootTargets(hitLimit);
+      if (!targets.length) {
+        registerMiss();
+        return;
+      }
+
+      targets.forEach(killEnemy);
+      updateHUD();
+    }
+
+    function knifeAttack() {
+      const item = getCurrentItem();
+      if (!item || !item.owned) {
+        flashNotice("Buy it first");
+        return;
+      }
+
+      playSound("knife");
+
+      const hits = state.game.enemies
+        .filter((enemy) =>
+          enemy.alive &&
+          Math.abs(enemy.y - state.game.pointer.y) <= 42 &&
+          dist(enemy.x, enemy.y, state.game.pointer.x, state.game.pointer.y) < 108
+        )
+        .sort((a, b) => Math.abs(a.x - state.game.pointer.x) - Math.abs(b.x - state.game.pointer.x))
+        .slice(0, getKnifeHitLimit(item));
+
+      if (!hits.length) {
+        registerMiss();
+        return;
+      }
+
+      hits.forEach(killEnemy);
+      updateHUD();
+    }
+
+    function bombAttack() {
+      const item = getCurrentItem();
+      if (!item || item.quantity <= 0) {
+        flashNotice("No bomb left");
+        return;
+      }
+
+      playSound("bomb");
+      item.quantity = Math.max(0, item.quantity - 1);
+      saveGame1State();
+
+      const blast = document.createElement("div");
+      blast.className = "blast";
+      blast.style.left = state.game.pointer.x + "px";
+      blast.style.top = state.game.pointer.y + "px";
+      el.arena.appendChild(blast);
+      setTimeout(() => blast.remove(), 350);
+
+      const radius = item.id === "bomb2" ? 185 : 132;
+      const maxHits = item.id === "bomb2" ? 10 : 5;
+
+      const hits = state.game.enemies
+        .filter((enemy) => enemy.alive && dist(enemy.x, enemy.y, state.game.pointer.x, state.game.pointer.y) <= radius)
+        .sort((a, b) => dist(a.x, a.y, state.game.pointer.x, state.game.pointer.y) - dist(b.x, b.y, state.game.pointer.x, state.game.pointer.y))
+        .slice(0, maxHits);
+
+      if (!hits.length) {
+        registerMiss();
+        renderWheel();
+        return;
+      }
+
+      hits.forEach(killEnemy);
+      renderWheel();
+      updateHUD();
+    }
+
+    function startHookDrag(clientX, clientY) {
+      if (state.game.level < 4) return false;
+
+      if (state.game.hookCharges <= 0) {
+        flashNotice("No hook left");
+        renderWheel();
+        return true;
+      }
+
+      const rect = getArenaRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      const civ = state.game.civilians.find(
+        (c) => c.alive && !c.saved && dist(c.x, c.y, x, y) < 42
+      );
+
+      if (!civ) {
+        flashNotice("Tap a civilian");
+        return true;
+      }
+
+      state.game.hookCharges--;
+      state.game.draggedCivilian = civ;
+      civ.dragging = true;
+      civ.node.classList.add("dragging");
+      renderWheel();
+      updateHUD();
+      flashNotice(`${civ.name} hooked`);
+      return true;
+    }
+
+    function updateHookDrag() {
+      if (!state.game || !state.game.draggedCivilian) return;
+
+      const civ = state.game.draggedCivilian;
+      if (!civ.alive || civ.saved) {
+        state.game.draggedCivilian = null;
+        return;
+      }
+
+      civ.x += (state.game.pointer.x - civ.x) * 0.22;
+      civ.y += (state.game.pointer.y - civ.y) * 0.22;
+      civ.node.style.left = civ.x + "px";
+      civ.node.style.top = civ.y + "px";
+
+      const line = state.game.hookLine;
+      const startX = state.game.playerX;
+      const startY = state.game.playerY - 14;
+      const dx = civ.x - startX;
+      const dy = civ.y - startY;
+      const len = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      line.style.display = "block";
+      line.style.left = startX + "px";
+      line.style.top = startY + "px";
+      line.style.width = len + "px";
+      line.style.transform = `rotate(${angle}deg)`;
+
+      const zone = getSafeZoneRectInArena();
+      const insideSafeZone =
+        civ.x > zone.x &&
+        civ.x < zone.x + zone.width &&
+        civ.y > zone.y &&
+        civ.y < zone.y + zone.height;
+
+      if (insideSafeZone) {
+        civ.saved = true;
+        civ.dragging = false;
+        civ.node.classList.remove("dragging");
+        civ.node.classList.add("dead");
+        setTimeout(() => civ.node.remove(), 180);
+
+        state.game.savedCount++;
+        state.game.draggedCivilian = null;
+        line.style.display = "none";
+
+        flashNotice(`${civ.name} saved`);
+        updateHUD();
+        checkWin();
+      }
+    }
+
+    function cancelHookDrag() {
+      if (!state.game) return;
+      if (state.game.draggedCivilian) {
+        state.game.draggedCivilian.dragging = false;
+        state.game.draggedCivilian.node.classList.remove("dragging");
+      }
+      state.game.draggedCivilian = null;
+      if (state.game.hookLine) state.game.hookLine.style.display = "none";
+    }
+
+    function handleArenaAction(ev) {
+      if (!state.game || !state.game.running) return;
+      if (state.game.playerDragging || state.game.wheelDragging) return;
+
+      updatePointerFromEvent(ev);
+
+      const item = getCurrentItem();
+      if (!item) return;
+
+      if (item.type === "ammo") {
+        useAmmo(item);
+        return;
+      }
+
+      if (item.type === "vest") {
+        useVestItem(item);
+        return;
+      }
+
+      if (item.mode === "hook") {
+        startHookDrag(ev.clientX, ev.clientY);
+        return;
+      }
+
+      if (item.mode === "knife") {
+        knifeAttack();
+        return;
+      }
+
+      if (item.mode === "bomb") {
+        bombAttack();
+        return;
+      }
+
+      shootGun();
+    }
+
+    function maybeEnemyShoot(dt) {
+      if (!state.game || state.game.level < 4) return;
+
+      state.game.enemyCooldown -= dt;
+      if (state.game.enemyCooldown > 0) return;
+
+      const shooters = state.game.enemies.filter((enemy) => enemy.alive);
+      if (!shooters.length) return;
+
+      const shooter = shooters[Math.floor(Math.random() * shooters.length)];
+
+      const bullet = document.createElement("div");
+      bullet.className = "enemy-bullet";
+      bullet.style.left = shooter.x + "px";
+      bullet.style.top = shooter.y + "px";
+      el.arena.appendChild(bullet);
+
+      let tx = state.game.playerX;
+      let ty = state.game.playerY;
+
+      const livingCivs = state.game.civilians.filter((c) => c.alive && !c.saved);
+      if (shooter.special && livingCivs.length && Math.random() < 0.58) {
+        const civ = livingCivs[Math.floor(Math.random() * livingCivs.length)];
+        tx = civ.x;
+        ty = civ.y;
+      }
+
+      const dx = tx - shooter.x;
+      const dy = ty - shooter.y;
+      const len = Math.hypot(dx, dy) || 1;
+
+      state.game.enemyBullets.push({
+        x: shooter.x,
+        y: shooter.y,
+        vx: (dx / len) * 325 * shooter.fireBias,
+        vy: (dy / len) * 325 * shooter.fireBias,
+        node: bullet
+      });
+
+      state.game.enemyCooldown = rand(0.7, 1.08);
+    }
+
+    function moveEnemyBullets(dt) {
+      state.game.enemyBullets = state.game.enemyBullets.filter((bullet) => {
+        bullet.x += bullet.vx * dt;
+        bullet.y += bullet.vy * dt;
+        bullet.node.style.left = bullet.x + "px";
+        bullet.node.style.top = bullet.y + "px";
+
+        if (dist(bullet.x, bullet.y, state.game.playerX, state.game.playerY) < 24) {
+          bullet.node.remove();
+          playerHit();
+          return false;
+        }
+
+        for (const civ of state.game.civilians) {
+          if (!civ.alive || civ.saved) continue;
+          if (dist(bullet.x, bullet.y, civ.x, civ.y) < 22) {
+            civ.alive = false;
+            civ.dragging = false;
+            civ.node.classList.add("dead");
+            setTimeout(() => civ.node.remove(), 180);
+            bullet.node.remove();
+            endMission(false, `${civ.name} was shot`);
+            return false;
+          }
+        }
+
+        const rect = getArenaRect();
+        if (bullet.x < -30 || bullet.x > rect.width + 30 || bullet.y < -30 || bullet.y > rect.height + 30) {
+          bullet.node.remove();
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    function moveEnemies(dt) {
+      const rect = getArenaRect();
+
+      state.game.enemies.forEach((enemy) => {
+        if (!enemy.alive) return;
+
+        enemy.x += enemy.vx * dt;
+        enemy.y += enemy.vy * dt;
+
+        const minX = 42;
+        const maxX = rect.width - 42;
+        const minY = 52;
+        const maxY = rect.height - 112;
+
+        if (enemy.x <= minX || enemy.x >= maxX) enemy.vx *= -1;
+        if (enemy.y <= minY || enemy.y >= maxY) enemy.vy *= -1;
+
+        enemy.x = clamp(enemy.x, minX, maxX);
+        enemy.y = clamp(enemy.y, minY, maxY);
+
+        enemy.node.style.left = enemy.x + "px";
+        enemy.node.style.top = enemy.y + "px";
+      });
+    }
+
+    function movePlayerTowardTarget(dt) {
+      if (!state.game || !state.game.canMove) return;
+
+      const dx = state.game.playerTargetX - state.game.playerX;
+      const dy = state.game.playerTargetY - state.game.playerY;
+      const d = Math.hypot(dx, dy);
+
+      if (d < 1) return;
+
+      const speed = 285;
+      const step = Math.min(d, speed * dt);
+
+      state.game.playerX += (dx / d) * step;
+      state.game.playerY += (dy / d) * step;
+
+      positionPlayer();
+      positionWheel();
+      positionCrosshair();
+    }
+
+    function checkWin() {
+      if (!state.game) return;
+
+      const allDead = state.game.kills >= state.game.enemyTarget;
+      const allSaved = state.game.level < 4 || state.game.savedCount >= state.game.targetSaved;
+
+      if (allDead && allSaved) {
+        endMission(true, "Mission cleared");
+      }
+    }
+
+    function showOverlay({
+      title,
+      text,
+      primaryText = "Continue",
+      secondaryText = "Back",
+      onPrimary,
+      onSecondary,
+      hideSecondary = false
+    }) {
+      el.overlayTitle.textContent = title;
+      el.overlayText.innerHTML = text;
+      el.overlayPrimary.textContent = primaryText;
+      el.overlaySecondary.textContent = secondaryText;
+      el.overlaySecondary.style.display = hideSecondary ? "none" : "inline-flex";
+
+      el.overlay.classList.add("active");
+
+      el.overlayPrimary.onclick = () => {
+        el.overlay.classList.remove("active");
+        if (onPrimary) onPrimary();
+      };
+
+      el.overlaySecondary.onclick = () => {
+        el.overlay.classList.remove("active");
+        if (onSecondary) onSecondary();
+      };
+    }
+
+    function endMission(won, reason) {
+      if (!state.game) return;
+
+      state.game.running = false;
+      cancelAnimationFrame(state.game.raf);
+
+      if (won) {
+        unlockNextMission(state.game.level);
+        saveGame1State();
+
+        showOverlay({
+          title: "You Win",
+          text: `${reason}<br>You now have <strong>${state.points}</strong> points.`,
+          primaryText: "Back To Menu",
+          secondaryText: "Open Store",
+          onPrimary: () => {
+            state.game = null;
+            clearArena();
+            window.location.href = "game1-level.html";
+          },
+          onSecondary: () => {
+            state.game = null;
+            clearArena();
+            window.location.href = "game1-store.html";
+          }
+        });
+      } else {
+        showOverlay({
+          title: "You Lose",
+          text: `${reason}<br>Try again or buy better gear.`,
+          primaryText: "Retry",
+          secondaryText: "Menu",
+          onPrimary: () => {
+            clearArena();
+            startMission();
+          },
+          onSecondary: () => {
+            state.game = null;
+            clearArena();
+            window.location.href = "game1-level.html";
+          }
+        });
+      }
+    }
+
+    function step(ts) {
+      if (!state.game || !state.game.running) return;
+
+      const dt = Math.min(0.03, ((ts - state.game.lastTs) || 16) / 1000);
+      state.game.lastTs = ts;
+
+      state.game.timeLeft -= dt;
+      if (state.game.timeLeft <= 0) {
+        endMission(false, "Time is up");
+        return;
+      }
+
+      movePlayerTowardTarget(dt);
+      moveEnemies(dt);
+      maybeEnemyShoot(dt);
+      moveEnemyBullets(dt);
+      updateHookDrag();
+      updateHUD();
+      positionCrosshair();
+      positionPlayer();
+      positionWheel();
+
+      state.game.raf = requestAnimationFrame(step);
+    }
+
+    function spawnEnemies(game) {
+      const rect = getArenaRect();
+      const cfg = getLevelConfig(game.level);
+
+      for (let i = 0; i < game.enemyTarget; i++) {
+        const special = game.level >= 4 && i === game.enemyTarget - 1;
+        const speedScale = special ? cfg.specialSpeed : cfg.enemySpeed;
+
+        const x = rand(90, rect.width - 76);
+        const y = rand(72, rect.height - 132);
+
+        const enemy = {
+          id: `enemy_${i}`,
+          x,
+          y,
+          vx: rand(62, 112) * speedScale * (Math.random() < 0.5 ? -1 : 1),
+          vy: rand(38, 86) * speedScale * (Math.random() < 0.5 ? -1 : 1),
+          alive: true,
+          special,
+          fireBias: special ? 1.24 : 1,
+          node: createEntity(
+            x,
+            y,
+            `images/games/game1/enemies/${(i % 10) + 1}.png`,
+            special ? "MASTER" : "ENEMY",
+            special ? "enemy special" : "enemy"
+          )
+        };
+
+        game.enemies.push(enemy);
+      }
+    }
+
+    function spawnCivilians(game) {
+      if (game.level < 4) return;
+
+      const rect = getArenaRect();
+      const people = [{ id: "eya", name: "EYA", img: "images/games/eya.png" }];
+
+      if (game.level === 5) {
+        people.push({ id: "kian", name: "KIAN", img: "images/games/kian.png" });
+      }
+
+      people.forEach((person) => {
+        const x = rand(128, rect.width - 150);
+        const y = rand(106, rect.height - 122);
+
+        const civ = {
+          ...person,
+          x,
+          y,
+          saved: false,
+          alive: true,
+          dragging: false,
+          node: createEntity(x, y, person.img, person.name, "civilian")
+        };
+
+        game.civilians.push(civ);
+      });
+    }
+
+    function startMission() {
+      clearArena();
+
+      const mission = getMission();
+      const cfg = LEVELS[mission.level];
+      switchToMissionVisuals(mission.level);
+
+      requestAnimationFrame(() => {
+        const rect = getArenaRect();
+        const hookItem = getItem("hook");
+        const purchasedHookBonus = hookItem ? (hookItem.quantity || 0) : 0;
+
+        if (hookItem && purchasedHookBonus > 0) {
+          hookItem.quantity = 0;
+          saveGame1State();
+        }
+
+        const hookLine = document.createElement("div");
+        hookLine.className = "hook-line";
+        hookLine.style.display = "none";
+        el.arena.appendChild(hookLine);
+
+        state.game = {
+          running: true,
+          level: mission.level,
+          kills: 0,
+          enemyTarget: cfg.enemyCount,
+          bullets: cfg.bullets,
+          lives: cfg.lives,
+          timeLeft: cfg.timer,
+          misses: 0,
+          missLimit: cfg.missLimit,
+          enemies: [],
+          civilians: [],
+          enemyBullets: [],
+          savedCount: 0,
+          targetSaved: mission.level === 4 ? 1 : mission.level === 5 ? 2 : 0,
+          enemyCooldown: mission.level >= 4 ? 1 : 999,
+          pointer: { x: rect.width * 0.72, y: rect.height * 0.34 },
+          playerX: rect.width / 2,
+          playerY: rect.height - 56,
+          playerTargetX: rect.width / 2,
+          playerTargetY: rect.height - 56,
+          canMove: cfg.canMove,
+          playerDragging: false,
+          draggedCivilian: null,
+          hookLine,
+          hookCharges: mission.level >= 4 ? cfg.hooks + purchasedHookBonus : 0,
+          wheelDragging: false,
+          wheelStartAngle: 0,
+          wheelStartIndex: 0,
+          wheelRotation: 0,
+          lastTs: performance.now(),
+          raf: null
+        };
+
+        state.inventory.vest = false;
+
+        if (!getItem(state.equipped) || !itemAllowedForMission(getItem(state.equipped), mission.level)) {
+          state.equipped = mission.level >= 4 ? "hook" : "gun1";
+        }
+
+        spawnEnemies(state.game);
+        spawnCivilians(state.game);
+        positionPlayer();
+        positionCrosshair();
+        renderWheel();
+        updateHUD();
+        flashNotice(`Mission ${mission.level} start`);
+
+        state.game.raf = requestAnimationFrame(step);
+      });
+    }
+
+    function switchToMissionVisuals(level) {
+      el.arenaBgImg.src = `images/games/game1/bg/${level}.jpg`;
+      el.playerImg.src = `images/games/game1/level/${level}.png`;
+
+      el.gameSubtitle.textContent =
+        level >= 4
+          ? "Move, fight back, and rescue civilians before they get shot."
+          : "Beat the timer and clear all enemies before bullets run out.";
+
+      el.safeZone.classList.toggle("show", level >= 4);
+    }
+
+    function setupWheelInteraction() {
+      const wheel = el.radialWheel;
+
+      wheel.addEventListener("pointerdown", (ev) => {
+        if (!state.game) return;
+        ev.stopPropagation();
+
+        const entries = getWheelEntries();
+        if (!entries.length) return;
+
+        const rect = wheel.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        state.game.wheelDragging = true;
+        state.game.wheelStartAngle = Math.atan2(ev.clientY - cy, ev.clientX - cx);
+        state.game.wheelStartIndex = Math.max(0, entries.findIndex((entry) => entry.item.id === state.equipped));
+        wheel.setPointerCapture?.(ev.pointerId);
+      });
+
+      wheel.addEventListener("pointermove", (ev) => {
+        if (!state.game || !state.game.wheelDragging) return;
+        ev.stopPropagation();
+
+        const entries = getWheelEntries();
+        if (!entries.length) return;
+
+        const rect = wheel.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        const current = Math.atan2(ev.clientY - cy, ev.clientX - cx);
+        const diff = current - state.game.wheelStartAngle;
+
+        state.game.wheelRotation = diff;
+
+        const stepAngle = (Math.PI * 2) / entries.length;
+        const steps = Math.round(diff / stepAngle);
+        let index = state.game.wheelStartIndex + steps;
+
+        while (index < 0) index += entries.length;
+        while (index >= entries.length) index -= entries.length;
+
+        const candidate = entries[index];
+        if (candidate && !candidate.disabled) {
+          state.equipped = candidate.item.id;
+          saveGame1State();
+        }
+
+        renderWheel();
+        updateHUD();
+      });
+
+      const endDrag = (ev) => {
+        if (!state.game) return;
+        state.game.wheelDragging = false;
+        state.game.wheelRotation = 0;
+        renderWheel();
+        wheel.releasePointerCapture?.(ev.pointerId);
+      };
+
+      wheel.addEventListener("pointerup", endDrag);
+      wheel.addEventListener("pointercancel", endDrag);
+    }
+
+    function setupPlayerMovement() {
+      const player = el.player;
+
+      player.addEventListener("pointerdown", (ev) => {
+        if (!state.game || !state.game.canMove) return;
+        ev.stopPropagation();
+        state.game.playerDragging = true;
+        player.setPointerCapture?.(ev.pointerId);
+
+        const rect = getArenaRect();
+        state.game.playerTargetX = clamp(ev.clientX - rect.left, 44, rect.width - 44);
+        state.game.playerTargetY = clamp(ev.clientY - rect.top, rect.height - 118, rect.height - 50);
+      });
+
+      player.addEventListener("pointermove", (ev) => {
+        if (!state.game || !state.game.canMove || !state.game.playerDragging) return;
+        ev.stopPropagation();
+
+        const rect = getArenaRect();
+        state.game.playerTargetX = clamp(ev.clientX - rect.left, 44, rect.width - 44);
+        state.game.playerTargetY = clamp(ev.clientY - rect.top, rect.height - 118, rect.height - 50);
+      });
+
+      const stopPlayerDrag = (ev) => {
+        if (!state.game) return;
+        state.game.playerDragging = false;
+        player.releasePointerCapture?.(ev.pointerId);
+      };
+
+      player.addEventListener("pointerup", stopPlayerDrag);
+      player.addEventListener("pointercancel", stopPlayerDrag);
+    }
+
+    function bindEvents() {
+      document.getElementById("buyBtn").onclick = () => {
+        saveGame1State();
+        window.location.href = "game1-store.html";
+      };
+
+      document.getElementById("backToMenuBtn").onclick = () => {
+        if (state.game?.running) {
+          showOverlay({
+            title: "Leave mission?",
+            text: "Your current run will end if you go back to the menu.",
+            primaryText: "Leave",
+            secondaryText: "Stay",
+            onPrimary: () => {
+              cancelAnimationFrame(state.game?.raf);
+              state.game = null;
+              clearArena();
+              window.location.href = "game1-level.html";
+            }
+          });
+        } else {
+          window.location.href = "game1-level.html";
+        }
+      };
+
+      document.getElementById("restartTopBtn").onclick = () => {
+        startMission();
+      };
+
+      el.arena.addEventListener("pointerdown", handleArenaAction);
+
+      el.arena.addEventListener("pointermove", (ev) => {
+        if (!state.game) return;
+        updatePointerFromEvent(ev);
+      });
+
+      el.arena.addEventListener("pointerup", () => {
+        if (!state.game) return;
+        if (getCurrentItem()?.mode === "hook") cancelHookDrag();
+      });
+
+      el.arena.addEventListener("pointercancel", () => {
+        if (!state.game) return;
+        cancelHookDrag();
+      });
+
+      window.addEventListener("keydown", (ev) => {
+        if (!state.game || !state.game.canMove) return;
+
+        const rect = getArenaRect();
+        const stepSize = 28;
+
+        if (ev.key === "ArrowLeft" || ev.key.toLowerCase() === "a") {
+          state.game.playerTargetX = clamp(state.game.playerTargetX - stepSize, 44, rect.width - 44);
+        } else if (ev.key === "ArrowRight" || ev.key.toLowerCase() === "d") {
+          state.game.playerTargetX = clamp(state.game.playerTargetX + stepSize, 44, rect.width - 44);
+        } else if (ev.key === "ArrowUp" || ev.key.toLowerCase() === "w") {
+          state.game.playerTargetY = clamp(state.game.playerTargetY - stepSize, rect.height - 118, rect.height - 50);
+        } else if (ev.key === "ArrowDown" || ev.key.toLowerCase() === "s") {
+          state.game.playerTargetY = clamp(state.game.playerTargetY + stepSize, rect.height - 118, rect.height - 50);
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (!state.game) return;
+        requestAnimationFrame(() => {
+          const rect = getArenaRect();
+          state.game.playerX = clamp(state.game.playerX, 44, rect.width - 44);
+          state.game.playerY = clamp(state.game.playerY, rect.height - 118, rect.height - 50);
+          state.game.playerTargetX = clamp(state.game.playerTargetX, 44, rect.width - 44);
+          state.game.playerTargetY = clamp(state.game.playerTargetY, rect.height - 118, rect.height - 50);
+          state.game.pointer.x = clamp(state.game.pointer.x, 22, rect.width - 22);
+          state.game.pointer.y = clamp(state.game.pointer.y, 22, rect.height - 22);
+          positionPlayer();
+          positionCrosshair();
+          renderWheel();
+        });
+      });
+
+      setupWheelInteraction();
+      setupPlayerMovement();
+    }
+
+    bindEvents();
+    startMission();
+  </script>
+</body>
+</html>

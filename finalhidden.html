@@ -1,0 +1,1297 @@
+<!-- =========================
+   finalhiddenpage.html
+========================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#fce4ec" />
+  <title>Hidden Heart 💌</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --pink-main: #d86c9c;
+      --pink-deep: #c85a8d;
+      --pink-soft: #f48fb1;
+      --pink-light: #f8bbd0;
+      --pink-border: #f4a6c8;
+      --text-soft: #b85f87;
+
+      --bg-1: #fff7fb;
+      --bg-2: #ffeef6;
+      --bg-3: #ffe5f1;
+
+      --glass: rgba(255, 255, 255, 0.8);
+      --glass-strong: rgba(255, 255, 255, 0.92);
+
+      --shadow-soft: 0 14px 32px rgba(216, 108, 156, 0.14);
+      --shadow-card: 0 14px 28px rgba(204, 92, 143, 0.18);
+      --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.28);
+
+      --frame-radius: 50px;
+      --screen-radius: 40px;
+      --phone-width: min(390px, 94vw);
+      --ease: 0.22s ease;
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: linear-gradient(135deg, #fce4f3, #fcdce6);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+      outline: none;
+    }
+
+    button {
+      border: none;
+      transition:
+        transform 0.15s ease,
+        box-shadow var(--ease),
+        opacity var(--ease),
+        background var(--ease),
+        color var(--ease);
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    .phone-frame {
+      width: var(--phone-width);
+      aspect-ratio: 390 / 844;
+      background: #000;
+      border-radius: var(--frame-radius);
+      padding: 12px;
+      box-shadow: var(--shadow-strong);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--screen-radius);
+      overflow: hidden;
+      position: relative;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      animation: appLaunch 0.72s ease-out;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(255, 220, 235, 0.9), transparent 30%),
+        radial-gradient(circle at 20% 85%, rgba(255, 192, 220, 0.28), transparent 32%),
+        radial-gradient(circle at 80% 75%, rgba(255, 170, 210, 0.16), transparent 30%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 48%, var(--bg-3) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      isolation: isolate;
+    }
+
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    @keyframes appLaunch {
+      0% {
+        opacity: 0;
+        transform: scale(0.93);
+        filter: blur(8px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.015);
+        filter: blur(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.85s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(1.03);
+      }
+    }
+
+    .bg-soul {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-soul::before,
+    .bg-soul::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(18px);
+      opacity: 0.55;
+      animation: breathe 8s ease-in-out infinite;
+    }
+
+    .bg-soul::before {
+      width: 220px;
+      height: 220px;
+      background: rgba(255, 197, 223, 0.42);
+      top: 4%;
+      left: -12%;
+    }
+
+    .bg-soul::after {
+      width: 240px;
+      height: 240px;
+      background: rgba(255, 160, 205, 0.2);
+      right: -18%;
+      bottom: 6%;
+      animation-delay: 2s;
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.42;
+      }
+      50% {
+        transform: scale(1.12);
+        opacity: 0.62;
+      }
+    }
+
+    .intro {
+      width: 100%;
+      padding: calc(env(safe-area-inset-top) + 36px) 20px 10px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .intro-script {
+      font-family: "Great Vibes", cursive;
+      font-size: 31px;
+      color: var(--pink-main);
+      margin: 0;
+      line-height: 1;
+      text-shadow: 0 4px 16px rgba(211, 93, 148, 0.14);
+    }
+
+    .intro-title {
+      margin: 10px 0 6px;
+      color: var(--text-soft);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.15px;
+    }
+
+    .intro-sub {
+      margin: 0 auto;
+      max-width: 292px;
+      color: var(--text-soft);
+      opacity: 0.84;
+      font-size: 11.8px;
+      line-height: 1.48;
+    }
+
+    .progress-wrap {
+      width: calc(100% - 32px);
+      margin-top: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-soft);
+      font-size: 11px;
+      margin-bottom: 6px;
+      opacity: 0.88;
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.55);
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ff8fbc, #ff5f9c);
+      transition: width 0.35s ease;
+      box-shadow: 0 0 18px rgba(255, 111, 165, 0.35);
+    }
+
+    .grid-wrap {
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px 16px 18px;
+      position: relative;
+      z-index: 2;
+      scrollbar-width: none;
+      min-height: 0;
+    }
+
+    .grid-wrap::-webkit-scrollbar {
+      display: none;
+    }
+
+    .grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(10px, 3vw, 15px);
+    }
+
+    .card {
+      width: 100%;
+      aspect-ratio: 1 / 1.02;
+      border-radius: 22px;
+      cursor: pointer;
+      position: relative;
+      perspective: 1200px;
+    }
+
+    .card.locked-soon .seal {
+      animation: pulseWarn 1.1s infinite;
+    }
+
+    @keyframes pulseWarn {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(236, 86, 122, 0.18); }
+      50% { box-shadow: 0 0 0 10px rgba(236, 86, 122, 0); }
+    }
+
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.85s ease;
+      will-change: transform;
+    }
+
+    .flip-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flip-front,
+    .flip-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    .flip-front {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,245,250,0.58)),
+        rgba(255,255,255,0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow:
+        var(--shadow-card),
+        inset 0 0 0 1px rgba(255,255,255,0.65);
+      color: var(--text-soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px;
+      animation: floatCard 4.5s ease-in-out infinite;
+    }
+
+    .flip-back {
+      transform: rotateY(180deg);
+      background:
+        linear-gradient(145deg, #ffb6d9, #ff77ab 58%, #ff5f98);
+      color: white;
+      box-shadow: 0 14px 28px rgba(204, 92, 143, 0.22);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .seal {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #ff7cad, #f35793);
+      color: white;
+      font-size: 16px;
+      box-shadow: 0 8px 18px rgba(243, 87, 147, 0.24);
+      flex-shrink: 0;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .tiny-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.72;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .card h3 {
+      font-size: 13px;
+      line-height: 1.35;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .card-note {
+      font-size: 11px;
+      line-height: 1.45;
+      opacity: 0.82;
+      margin-top: auto;
+    }
+
+    .card-status {
+      font-size: 10.5px;
+      opacity: 0.78;
+      margin-top: 8px;
+    }
+
+    .flip-back .back-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .flip-back .back-hint {
+      font-size: 11px;
+      line-height: 1.45;
+      opacity: 0.95;
+    }
+
+    .flip-back .opened-tag {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    .back-wrap {
+      width: 100%;
+      padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px);
+      position: relative;
+      z-index: 2;
+    }
+
+    .back-btn {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      background: linear-gradient(45deg, #ff6fa5, #f48fb1);
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 10px 24px rgba(204, 92, 143, 0.2);
+      min-height: 46px;
+    }
+
+    .back-btn:hover,
+    .back-btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(204, 92, 143, 0.24);
+    }
+
+    .modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(36, 9, 20, 0.48);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 35;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: rgba(255,255,255,0.95);
+      width: 100%;
+      max-width: 315px;
+      max-height: 82vh;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px;
+      border-radius: 24px;
+      text-align: left;
+      color: var(--text-soft);
+      box-shadow: 0 20px 50px rgba(204, 92, 143, 0.24);
+      animation: fadeIn 0.28s ease;
+      scrollbar-width: none;
+    }
+
+    .modal-box::-webkit-scrollbar {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .quiz-kicker {
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.72;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .modal-box h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: var(--text-soft);
+      line-height: 1.4;
+    }
+
+    .quiz-sub {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-soft);
+      opacity: 0.82;
+      margin-bottom: 12px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 14px;
+      border: 1px solid #f1a4c7;
+      margin-top: 4px;
+      font-size: 16px;
+      background: rgba(255,255,255,0.95);
+      color: var(--text-soft);
+    }
+
+    input[type="text"]:focus {
+      border-color: #ff6fa5;
+      box-shadow: 0 0 0 3px rgba(255, 111, 165, 0.16);
+    }
+
+    .message {
+      min-height: 20px;
+      margin-top: 10px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: #d64c82;
+      text-align: left;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .modal-box button {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 16px;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .submit-btn {
+      background: linear-gradient(45deg, #ff6fa5, #f48fb1);
+      box-shadow: 0 10px 22px rgba(255, 105, 180, 0.2);
+    }
+
+    .close-quiz-btn {
+      background: rgba(248, 187, 208, 0.95);
+      color: white;
+    }
+
+    .timer-text {
+      margin-top: 10px;
+      font-size: 11.5px;
+      color: var(--text-soft);
+      opacity: 0.82;
+      text-align: center;
+    }
+
+    .message-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 4, 12, 0.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 45;
+      padding: 20px;
+    }
+
+    .message-modal.active {
+      display: flex;
+    }
+
+    .message-box {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,245,249,0.93));
+      width: 100%;
+      max-width: 325px;
+      max-height: 78vh;
+      padding: 22px 20px 18px;
+      border-radius: 24px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      color: #a93370;
+      text-align: left;
+      box-shadow: 0 18px 45px rgba(204, 92, 143, 0.28);
+      scrollbar-width: none;
+      animation: revealSoul 0.35s ease;
+      position: relative;
+    }
+
+    .message-box::-webkit-scrollbar {
+      display: none;
+    }
+
+    @keyframes revealSoul {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .message-script {
+      font-family: "Great Vibes", cursive;
+      font-size: 29px;
+      color: var(--pink-main);
+      margin: 0 0 8px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .message-title {
+      margin: 0 0 12px;
+      color: var(--text-soft);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .message-text {
+      font-size: 13.5px;
+      line-height: 1.72;
+      color: #a93370;
+      white-space: pre-wrap;
+    }
+
+    .message-box button {
+      margin-top: 16px;
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 16px;
+      background: linear-gradient(45deg, #ff6fa5, #f48fb1);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 10px 22px rgba(255, 105, 180, 0.18);
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: sparkleAnim 3s linear infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @keyframes sparkleAnim {
+      0% { opacity: 0; transform: scale(0.7); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0; transform: scale(0.85); }
+    }
+
+    @keyframes heartFly {
+      0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-120px) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 500px) {
+      html,
+      body {
+        background: black;
+      }
+
+      body {
+        width: 100vw;
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+      }
+
+      .phone-frame {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        aspect-ratio: auto;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .phone-screen {
+        border-radius: 0;
+      }
+
+      .notch {
+        display: none;
+      }
+    }
+
+    @media (max-height: 720px) {
+      .intro {
+        padding-top: calc(env(safe-area-inset-top) + 28px);
+      }
+
+      .intro-script {
+        font-size: 27px;
+      }
+
+      .intro-title {
+        font-size: 15px;
+      }
+
+      .grid-wrap {
+        padding-top: 10px;
+      }
+
+      .card h3 {
+        font-size: 12px;
+      }
+
+      .card-note,
+      .flip-back .back-hint {
+        font-size: 10.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-screen" id="screen">
+    <div class="notch"></div>
+    <div class="bg-soul"></div>
+
+    <div class="intro">
+      <p class="intro-script">Inside My Heart</p>
+      <h1 class="intro-title">The things I don’t always know how to say</h1>
+      <p class="intro-sub">
+        You made it here, so this means you reached the softest, deepest part of me.
+        These are the thoughts I usually keep quiet, but always carry for you.
+      </p>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Unlocked confessions</span>
+        <span id="progressText">0 / 6</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="grid-wrap">
+      <div class="grid" id="cardGrid"></div>
+    </div>
+
+    <div class="back-wrap">
+      <button class="back-btn" id="backBtn" type="button">Back</button>
+    </div>
+  </div>
+</div>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="musics/finalhidden.mp3" type="audio/mpeg">
+</audio>
+
+<div class="modal" id="quizModal" aria-hidden="true">
+  <div class="modal-box">
+    <div class="quiz-kicker">Sealed confession</div>
+    <h3 id="quizQuestion"></h3>
+    <div class="quiz-sub" id="quizSub">
+      Answer with the right little code to open what I hid here for you.
+    </div>
+    <input type="text" id="quizAnswer" placeholder="Enter code" />
+    <div class="message" id="quizError"></div>
+    <div class="timer-text" id="quizTimer"></div>
+    <div class="modal-actions">
+      <button id="submitBtn" class="submit-btn" type="button">Open my heart</button>
+      <button id="closeBtn" class="close-quiz-btn" type="button">Maybe later</button>
+    </div>
+  </div>
+</div>
+
+<div class="message-modal" id="messageModal" aria-hidden="true">
+  <div class="message-box">
+    <p class="message-script">for you</p>
+    <h3 class="message-title" id="messageTitle"></h3>
+    <div class="message-text" id="messageText"></div>
+    <button type="button" id="closeMessageBtn">Hold this close</button>
+  </div>
+</div>
+
+<script>
+  const secrets = [
+    {
+      title: "Where I’m most sorry 💔",
+      tag: "Confession I",
+      teaser: "The guilt I still carry quietly.",
+      msg: "There are moments I replay in my head and wish I handled better. I know I can be difficult, quiet, moody, or hard to read sometimes, and I know that in loving me, you also had to carry versions of me that were not always easy.\n\nIf there are moments when I hurt you, confused you, or made you feel less loved than you deserve, please know that I do regret them deeply. Even the things I don’t say sorry for out loud stay inside me.\n\nI may not always know how to say it in the perfect way, but I do feel it. I really do.",
+      question: "What is the word that opens my apology?",
+      answer: "SORRY"
+    },
+    {
+      title: "What I appreciate most 🌟",
+      tag: "Confession II",
+      teaser: "The kind of love I notice even in silence.",
+      msg: "I don’t always say this enough, but I notice the way you stay. I notice your patience, your effort, your softness, your jokes, your presence, and the way you make things feel lighter even without trying too hard.\n\nYou make me feel held in a way that is hard to explain. Safe. Wanted. Chosen.\n\nThere is something about being loved by you that makes my heart unclench a little. And that means more to me than I usually know how to say.",
+      question: "What do I value most in the way you love me?",
+      answer: "SAFE"
+    },
+    {
+      title: "When I started falling 💖",
+      tag: "Confession III",
+      teaser: "The moment my heart stopped pretending.",
+      msg: "I think I started falling for you before I even wanted to admit it to myself. It was somewhere between the laughter, the comfort, the curiosity, the chaos, and the way you slowly became part of my day without asking permission.\n\nYou felt familiar in a way that scared me a little.\n\nAnd maybe that’s how I knew it was becoming real—because you were no longer just someone I liked being with. You became someone I looked for even in ordinary moments.",
+      question: "What cracked my heart open first?",
+      answer: "LAUGH"
+    },
+    {
+      title: "My dreams for us 🌈",
+      tag: "Confession IV",
+      teaser: "The future I secretly imagine with you.",
+      msg: "Sometimes I let myself imagine a life with you in small, soft scenes. Not always grand ones. Just real ones.\n\nSlow mornings. Laughing in the kitchen. Resting beside each other after a long day. Traveling somewhere new. Building routines that feel like home. Growing older without losing the sweetness.\n\nWhen I think of peace, I sometimes accidentally picture you inside it.",
+      question: "What word holds the future I imagine for us?",
+      answer: "HOME"
+    },
+    {
+      title: "What I never want you to doubt 🤍",
+      tag: "Confession V",
+      teaser: "The truth I hope reaches you on hard days.",
+      msg: "Even when I’m quiet, overwhelmed, stubborn, emotional, or hard to understand, I never want you to doubt this: I love you.\n\nThere may be messy days. There may be misunderstandings. There may be times I fail to express myself in the way you need.\n\nBut underneath all of that, my feelings for you are real. Steady. Sincere. Yours.",
+      question: "What should you never doubt?",
+      answer: "LOVE"
+    },
+    {
+      title: "How deeply you matter to me 🌙",
+      tag: "Confession VI",
+      teaser: "The part of me that keeps reaching for you.",
+      msg: "You matter to me more than I usually know how to show in one sentence, one message, one gesture, or one day.\n\nYou stay in my thoughts in quiet ways. In random pauses. In little memories. In the way my mood changes when I miss you. In the way some parts of my world now automatically make room for you.\n\nThat’s why this page exists at all. Because some feelings are too full to stay locked forever.",
+      question: "What word describes how much space you take in me?",
+      answer: "DEEP"
+    }
+  ];
+
+  const COOLDOWN_MS = 180000;
+  const STORAGE_KEY_UNLOCKED = "ltk_finalhidden_unlocked";
+  const STORAGE_KEY_COOLDOWNS = "ltk_finalhidden_cooldowns";
+
+  const screen = document.getElementById("screen");
+  const cardGrid = document.getElementById("cardGrid");
+  const quizModal = document.getElementById("quizModal");
+  const quizQuestion = document.getElementById("quizQuestion");
+  const quizSub = document.getElementById("quizSub");
+  const quizAnswer = document.getElementById("quizAnswer");
+  const quizError = document.getElementById("quizError");
+  const quizTimer = document.getElementById("quizTimer");
+  const submitBtn = document.getElementById("submitBtn");
+  const closeBtn = document.getElementById("closeBtn");
+  const messageModal = document.getElementById("messageModal");
+  const messageTitle = document.getElementById("messageTitle");
+  const messageText = document.getElementById("messageText");
+  const closeMessageBtn = document.getElementById("closeMessageBtn");
+  const progressFill = document.getElementById("progressFill");
+  const progressText = document.getElementById("progressText");
+  const backBtn = document.getElementById("backBtn");
+  const bgMusic = document.getElementById("bgMusic");
+
+  let currentIndex = null;
+  let currentInner = null;
+  let sparkleTimer = null;
+  let timerInterval = null;
+  let clickLock = false;
+  let isLeaving = false;
+
+  function getUnlocked() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY_UNLOCKED)) || [];
+    } catch {
+      return [];
+    }
+  }
+
+  function setUnlocked(arr) {
+    localStorage.setItem(STORAGE_KEY_UNLOCKED, JSON.stringify(arr));
+  }
+
+  function getCooldowns() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY_COOLDOWNS)) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function setCooldowns(obj) {
+    localStorage.setItem(STORAGE_KEY_COOLDOWNS, JSON.stringify(obj));
+  }
+
+  function isUnlocked(index) {
+    return getUnlocked().includes(index);
+  }
+
+  function unlockCard(index) {
+    const unlocked = getUnlocked();
+    if (!unlocked.includes(index)) {
+      unlocked.push(index);
+      setUnlocked(unlocked);
+    }
+  }
+
+  function getCooldown(index) {
+    const cooldowns = getCooldowns();
+    return Number(cooldowns[index] || 0);
+  }
+
+  function setCooldown(index, value) {
+    const cooldowns = getCooldowns();
+    cooldowns[index] = value;
+    setCooldowns(cooldowns);
+  }
+
+  function clearCooldown(index) {
+    const cooldowns = getCooldowns();
+    delete cooldowns[index];
+    setCooldowns(cooldowns);
+  }
+
+  function formatRemaining(ms) {
+    const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function updateProgress() {
+    const unlockedCount = getUnlocked().length;
+    progressText.textContent = `${unlockedCount} / ${secrets.length}`;
+    progressFill.style.width = `${(unlockedCount / secrets.length) * 100}%`;
+  }
+
+  function buildCard(secret, i) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.index = i;
+
+    const inner = document.createElement("div");
+    inner.className = "flip-inner";
+
+    const isOpen = isUnlocked(i);
+    if (isOpen) inner.classList.add("flipped");
+
+    inner.innerHTML = `
+      <div class="flip-front">
+        <div class="card-top">
+          <div>
+            <div class="tiny-label">${secret.tag}</div>
+            <h3>${secret.title}</h3>
+          </div>
+          <div class="seal">💌</div>
+        </div>
+
+        <div>
+          <div class="card-note">${secret.teaser}</div>
+          <div class="card-status">Tap to unlock this confession.</div>
+        </div>
+      </div>
+
+      <div class="flip-back">
+        <div class="opened-tag">Opened</div>
+        <div class="back-title">${secret.title}</div>
+        <div class="back-hint">You already opened this part of my heart. Tap again if you want to read it once more.</div>
+      </div>
+    `;
+
+    card.appendChild(inner);
+    card.addEventListener("click", () => handleCardClick(i, inner, card));
+    return card;
+  }
+
+  function renderCards() {
+    cardGrid.innerHTML = "";
+    secrets.forEach((secret, i) => {
+      cardGrid.appendChild(buildCard(secret, i));
+    });
+    updateProgress();
+    refreshCooldownVisuals();
+  }
+
+  function refreshCooldownVisuals() {
+    const now = Date.now();
+    [...cardGrid.children].forEach((card, i) => {
+      const lockedUntil = getCooldown(i);
+      card.classList.toggle("locked-soon", lockedUntil > now && !isUnlocked(i));
+    });
+  }
+
+  function handleCardClick(i, inner, card) {
+    if (clickLock || isLeaving) return;
+    clickLock = true;
+    setTimeout(() => {
+      clickLock = false;
+    }, 300);
+
+    currentIndex = i;
+    currentInner = inner;
+
+    if (isUnlocked(i)) {
+      openMessage(i);
+      return;
+    }
+
+    const lockedUntil = getCooldown(i);
+    if (Date.now() < lockedUntil) {
+      openQuiz(i, inner, true);
+      return;
+    }
+
+    openQuiz(i, inner, false);
+  }
+
+  function setQuizOpen(isOpen) {
+    quizModal.classList.toggle("active", isOpen);
+    quizModal.setAttribute("aria-hidden", String(!isOpen));
+    if (!isOpen) {
+      stopTimer();
+    }
+  }
+
+  function setMessageOpen(isOpen) {
+    messageModal.classList.toggle("active", isOpen);
+    messageModal.setAttribute("aria-hidden", String(!isOpen));
+  }
+
+  function openQuiz(i, inner, alreadyLocked = false) {
+    currentIndex = i;
+    currentInner = inner;
+
+    const secret = secrets[i];
+    const lockedUntil = getCooldown(i);
+
+    setQuizOpen(true);
+    quizQuestion.textContent = secret.question;
+    quizSub.textContent = alreadyLocked
+      ? "This confession closed itself for a little while. Wait gently, then try again."
+      : "Answer with the right little code to open what I hid here for you.";
+    quizAnswer.value = "";
+    quizError.textContent = "";
+    quizTimer.textContent = "";
+    quizAnswer.disabled = Date.now() < lockedUntil;
+    submitBtn.disabled = Date.now() < lockedUntil;
+    submitBtn.style.opacity = submitBtn.disabled ? "0.6" : "1";
+
+    if (Date.now() < lockedUntil) {
+      startTimer(i);
+    } else {
+      setTimeout(() => quizAnswer.focus(), 80);
+    }
+  }
+
+  function closeQuiz() {
+    setQuizOpen(false);
+  }
+
+  function openMessage(i) {
+    const secret = secrets[i];
+    messageTitle.textContent = secret.title;
+    messageText.textContent = secret.msg;
+    setMessageOpen(true);
+  }
+
+  function closeMessage() {
+    setMessageOpen(false);
+  }
+
+  function startTimer(index) {
+    stopTimer();
+
+    function tick() {
+      const remaining = getCooldown(index) - Date.now();
+      if (remaining <= 0) {
+        clearCooldown(index);
+        quizTimer.textContent = "";
+        quizError.textContent = "";
+        quizAnswer.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        quizSub.textContent = "You can try again now.";
+        refreshCooldownVisuals();
+        stopTimer();
+        return;
+      }
+
+      quizTimer.textContent = `This part of me will open again in ${formatRemaining(remaining)}.`;
+      quizAnswer.disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = "0.6";
+    }
+
+    tick();
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function createHeartBurst() {
+    for (let i = 0; i < 12; i++) {
+      const h = document.createElement("div");
+      h.textContent = "💖";
+      h.style.position = "absolute";
+      h.style.left = Math.random() * 100 + "%";
+      h.style.top = (40 + Math.random() * 20) + "%";
+      h.style.fontSize = "18px";
+      h.style.pointerEvents = "none";
+      h.style.animation = "heartFly 1.4s ease forwards";
+      h.style.zIndex = "40";
+      screen.appendChild(h);
+
+      setTimeout(() => h.remove(), 1400);
+    }
+  }
+
+  function handleSubmit() {
+    if (currentIndex === null) return;
+
+    const secret = secrets[currentIndex];
+    const input = quizAnswer.value.trim().toUpperCase();
+
+    if (input === secret.answer.trim().toUpperCase()) {
+      unlockCard(currentIndex);
+      clearCooldown(currentIndex);
+      if (currentInner) currentInner.classList.add("flipped");
+      closeQuiz();
+      renderCards();
+      createHeartBurst();
+      setTimeout(() => {
+        openMessage(currentIndex);
+      }, 180);
+    } else {
+      setCooldown(currentIndex, Date.now() + COOLDOWN_MS);
+      quizError.textContent = "Sorry, Baby. I guess it’s not yet time for you to read this.";
+      quizSub.textContent = "Some words need a little patience before they open.";
+      quizAnswer.value = "";
+      quizAnswer.disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = "0.6";
+      refreshCooldownVisuals();
+      startTimer(currentIndex);
+    }
+  }
+
+  function createSparkle() {
+    const s = document.createElement("div");
+    s.className = "sparkle";
+    s.style.top = Math.random() * 100 + "%";
+    s.style.left = Math.random() * 100 + "%";
+    screen.appendChild(s);
+    setTimeout(() => s.remove(), 3000);
+  }
+
+  function startSparkles() {
+    if (sparkleTimer) return;
+    sparkleTimer = setInterval(createSparkle, 650);
+  }
+
+  function stopSparkles() {
+    if (!sparkleTimer) return;
+    clearInterval(sparkleTimer);
+    sparkleTimer = null;
+  }
+
+  function tryPlayMusic() {
+    bgMusic.play().catch(() => {});
+  }
+
+  function goToPage(url) {
+    if (isLeaving) return;
+    isLeaving = true;
+    screen.classList.add("fade-out");
+    setTimeout(() => {
+      window.location.href = url;
+    }, 850);
+  }
+
+  submitBtn.addEventListener("click", handleSubmit);
+  closeBtn.addEventListener("click", closeQuiz);
+  closeMessageBtn.addEventListener("click", closeMessage);
+
+  quizAnswer.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !submitBtn.disabled) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  });
+
+  quizModal.addEventListener("click", (e) => {
+    if (e.target === quizModal) closeQuiz();
+  });
+
+  messageModal.addEventListener("click", (e) => {
+    if (e.target === messageModal) closeMessage();
+  });
+
+  backBtn.addEventListener("click", () => {
+    goToPage("hiddenpage.html");
+  });
+
+  ["click", "touchstart", "pointerdown"].forEach((eventName) => {
+    document.addEventListener(eventName, tryPlayMusic, { once: true });
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (messageModal.classList.contains("active")) closeMessage();
+      else if (quizModal.classList.contains("active")) closeQuiz();
+    }
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopSparkles();
+      stopTimer();
+    } else {
+      startSparkles();
+      if (
+        quizModal.classList.contains("active") &&
+        currentIndex !== null &&
+        Date.now() < getCooldown(currentIndex)
+      ) {
+        startTimer(currentIndex);
+      }
+    }
+  });
+
+  renderCards();
+  startSparkles();
+</script>
+</body>
+</html>

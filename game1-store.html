@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Game 1 Store — LOVE TOKEN K&E</title>
+  <link rel="stylesheet" href="game1-shared.css" />
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen">
+
+      <div class="topbar">
+        <div class="top-left">
+          <button id="backFromStoreTopBtn">← Back</button>
+        </div>
+        <div class="top-right">
+          <button id="storeRefreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="title-wrap">
+        <h1 class="page-title">Mission Store</h1>
+        <p class="page-subtitle">Choose gear for your mission loadout.</p>
+      </div>
+
+      <div class="store-layout">
+        <div class="store-grid-wrap">
+          <div class="store-grid" id="storeGrid"></div>
+        </div>
+
+        <div class="store-side">
+          <div class="store-card store-summary-card">
+            <h3>Mission Access</h3>
+            <p id="storeMissionName">—</p>
+            <p id="storeMissionAccess">—</p>
+          </div>
+
+          <div class="store-card">
+            <h3 id="detailTitle">Item Name</h3>
+            <p id="detailDesc">—</p>
+          </div>
+
+          <div class="store-card">
+            <h3>What It Does</h3>
+            <p id="detailEffect">—</p>
+          </div>
+
+          <div class="store-card">
+            <h3>Wallet</h3>
+            <p>Available Points : <span id="storePoints">0</span></p>
+            <p>Status : <span id="buyStatusText">—</span></p>
+            <p>Total Cost : <span id="storeTotalCost">0</span></p>
+          </div>
+
+          <div class="store-card quantity-card">
+            <h3>Quantity</h3>
+            <div class="qty-wrap">
+              <button id="qtyMinus" type="button">-</button>
+              <span id="qtyValue">1</span>
+              <button id="qtyPlus" type="button">+</button>
+            </div>
+          </div>
+
+          <div class="store-actions">
+            <button id="buySelectedBtn" class="buy-btn" type="button">Buy</button>
+            <button id="equipSelectedBtn" class="equip-btn" type="button">Equip</button>
+          </div>
+
+          <div class="store-card">
+            <h3>Quick Rules</h3>
+            <p>Weapons stay owned once bought.</p>
+            <p>Bombs, bullets, hooks, and vest use quantity per purchase.</p>
+            <p>Locked items depend on the currently selected mission level.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="store-notice" id="storeNotice"></div>
+
+    </div>
+  </div>
+
+  <script src="game1-shared.js"></script>
+  <script>
+    const state = window.game1State;
+
+    const el = {
+      storeGrid: document.getElementById("storeGrid"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailDesc: document.getElementById("detailDesc"),
+      detailEffect: document.getElementById("detailEffect"),
+      storePoints: document.getElementById("storePoints"),
+      buyStatusText: document.getElementById("buyStatusText"),
+      storeTotalCost: document.getElementById("storeTotalCost"),
+      qtyMinus: document.getElementById("qtyMinus"),
+      qtyPlus: document.getElementById("qtyPlus"),
+      qtyValue: document.getElementById("qtyValue"),
+      storeMissionName: document.getElementById("storeMissionName"),
+      storeMissionAccess: document.getElementById("storeMissionAccess"),
+      storeNotice: document.getElementById("storeNotice")
+    };
+
+    function flashStoreNotice(text) {
+      el.storeNotice.textContent = text;
+      el.storeNotice.classList.add("show");
+
+      clearTimeout(flashStoreNotice._timer);
+      flashStoreNotice._timer = setTimeout(() => {
+        el.storeNotice.classList.remove("show");
+      }, 1200);
+    }
+
+    function updateQuantityUI() {
+      el.qtyValue.textContent = state.buyQuantity;
+    }
+
+    function updateStoreMissionSummary() {
+      const mission = getMission();
+      const info = getStoreAccessSummary(mission.level);
+
+      el.storeMissionName.textContent = `${mission.name} — Level ${mission.level}`;
+      el.storeMissionAccess.textContent = info;
+    }
+
+    function renderStoreDetails() {
+      const item = getItem(state.storeSelected);
+      if (!item) return;
+
+      const status = getItemStatus(item);
+      const total = item.price * state.buyQuantity;
+      const level = getMission().level;
+      const locked = !itemAllowedForMission(item, level);
+      const ownedPermanent = item.type === "weapon" && !isConsumable(item) && item.owned;
+      const quantityBased = isConsumable(item) || item.mode === "bomb";
+
+      el.detailTitle.textContent = item.name;
+      el.detailDesc.textContent =
+        `Category: ${item.category} • Price: ${item.price} each` +
+        (locked ? ` • Unlocks at Level ${item.levelMin}` : "");
+
+      let effectText = getItemEffectText(item);
+      if (ownedPermanent) {
+        effectText += " Already owned permanently.";
+      } else if (quantityBased && item.quantity > 0) {
+        effectText += ` Current stock: ${item.quantity}.`;
+      }
+
+      el.detailEffect.textContent = effectText;
+      el.storePoints.textContent = state.points;
+      el.buyStatusText.textContent = status.text;
+      el.buyStatusText.className = status.cls;
+      el.storeTotalCost.textContent = total;
+
+      document.getElementById("buySelectedBtn").disabled = locked;
+      document.getElementById("equipSelectedBtn").disabled = locked;
+    }
+
+    function renderStore() {
+      const categories = ["Guns", "Knives", "Bombs", "Hooks", "Bullets"];
+      const level = getMission().level;
+      el.storeGrid.innerHTML = "";
+
+      categories.forEach((cat) => {
+        const label = document.createElement("div");
+        label.className = "row-label";
+        label.textContent = cat;
+        el.storeGrid.appendChild(label);
+
+        const items = state.items.filter((item) => item.category === cat);
+
+        for (let i = 0; i < 4; i++) {
+          const item = items[i];
+
+          if (!item) {
+            const empty = document.createElement("div");
+            empty.className = "store-empty-slot";
+            el.storeGrid.appendChild(empty);
+            continue;
+          }
+
+          const slot = document.createElement("button");
+          slot.type = "button";
+          slot.className = "store-slot";
+
+          if (item.id === state.storeSelected) slot.classList.add("selected");
+          if (!itemAllowedForMission(item, level)) slot.classList.add("locked");
+          if (isItemOwned(item)) slot.classList.add("owned");
+          if (state.equipped === item.id) slot.classList.add("equipped");
+
+          const qtyBadge =
+            item.quantity !== Infinity && item.quantity > 0
+              ? `<div class="slot-qty">x${item.quantity}</div>`
+              : "";
+
+          const ownedBadge =
+            item.type === "weapon" && !isConsumable(item) && item.owned
+              ? `<div class="slot-owned">Owned</div>`
+              : "";
+
+          const equippedBadge =
+            state.equipped === item.id
+              ? `<div class="slot-equipped">Equipped</div>`
+              : "";
+
+          slot.innerHTML = `
+            <img src="${item.image}" alt="${item.name}">
+            <div class="slot-price">${item.price}</div>
+            ${qtyBadge}
+            ${ownedBadge}
+            ${equippedBadge}
+          `;
+
+          slot.onclick = () => {
+            state.storeSelected = item.id;
+            saveGame1State();
+            renderStore();
+            renderStoreDetails();
+          };
+
+          el.storeGrid.appendChild(slot);
+        }
+      });
+
+      updateStoreMissionSummary();
+      renderStoreDetails();
+    }
+
+    function buySelected() {
+      const item = getItem(state.storeSelected);
+      const level = getMission().level;
+
+      if (!item || !itemAllowedForMission(item, level)) {
+        flashStoreNotice("Item locked");
+        return;
+      }
+
+      if (item.type === "weapon" && !isConsumable(item) && item.owned) {
+        flashStoreNotice("Already owned");
+        return;
+      }
+
+      const total = item.price * state.buyQuantity;
+      if (state.points < total) {
+        flashStoreNotice("Not enough points");
+        return;
+      }
+
+      state.points -= total;
+
+      if (item.type === "weapon" && !isConsumable(item) && item.quantity === Infinity) {
+        item.owned = true;
+        if (!state.inventory.weapons.includes(item.id)) {
+          state.inventory.weapons.push(item.id);
+        }
+      } else {
+        item.quantity += state.buyQuantity;
+        item.owned = true;
+      }
+
+      state.buyQuantity = 1;
+      saveGame1State();
+      updateQuantityUI();
+      renderStore();
+      flashStoreNotice(`${item.name} purchased`);
+    }
+
+    function equipSelected() {
+      const item = getItem(state.storeSelected);
+      const level = getMission().level;
+
+      if (!item || !itemAllowedForMission(item, level)) {
+        flashStoreNotice("Item locked");
+        return;
+      }
+
+      if (!isItemOwned(item)) {
+        flashStoreNotice("Buy it first");
+        return;
+      }
+
+      state.equipped = item.id;
+      saveGame1State();
+      renderStore();
+      flashStoreNotice(`${item.name} equipped`);
+    }
+
+    el.qtyMinus.onclick = () => {
+      state.buyQuantity = Math.max(1, state.buyQuantity - 1);
+      saveGame1State();
+      updateQuantityUI();
+      renderStoreDetails();
+    };
+
+    el.qtyPlus.onclick = () => {
+      state.buyQuantity += 1;
+      saveGame1State();
+      updateQuantityUI();
+      renderStoreDetails();
+    };
+
+    document.getElementById("buySelectedBtn").onclick = buySelected;
+    document.getElementById("equipSelectedBtn").onclick = equipSelected;
+
+    document.getElementById("backFromStoreTopBtn").onclick = () => {
+      saveGame1State();
+      window.location.href = "game1-level.html";
+    };
+
+    document.getElementById("storeRefreshBtn").onclick = () => {
+      renderStore();
+      flashStoreNotice("Store refreshed");
+    };
+
+    updateQuantityUI();
+    renderStore();
+  </script>
+</body>
+</html>

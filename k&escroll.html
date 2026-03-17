@@ -1,0 +1,1317 @@
+<!-- =========================
+   k&escroll.html
+========================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#fce4ec" />
+  <title>K&E Scrolling</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --pink-main: #d86c9c;
+      --pink-deep: #c85a8d;
+      --pink-soft: #f48fb1;
+      --pink-light: #f8bbd0;
+      --pink-border: #f4a6c8;
+      --text-soft: #b85f87;
+
+      --bg-1: #fff7fb;
+      --bg-2: #ffeaf4;
+      --bg-3: #fbeaff;
+
+      --glass: rgba(255, 255, 255, 0.78);
+      --glass-strong: rgba(255, 255, 255, 0.9);
+
+      --shadow-soft: 0 14px 32px rgba(216, 108, 156, 0.14);
+      --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.28);
+      --shadow-card: 0 10px 24px rgba(204, 92, 143, 0.12);
+
+      --frame-radius: 50px;
+      --screen-radius: 40px;
+      --phone-width: min(390px, 94vw);
+      --ease: 0.22s ease;
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0d7df;
+      touch-action: manipulation;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+      outline: none;
+    }
+
+    button {
+      border: none;
+      transition:
+        transform 0.15s ease,
+        box-shadow var(--ease),
+        opacity var(--ease),
+        background var(--ease),
+        color var(--ease);
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    .phone-frame {
+      width: var(--phone-width);
+      aspect-ratio: 390 / 844;
+      background: #000;
+      border-radius: var(--frame-radius);
+      padding: 12px;
+      box-shadow: var(--shadow-strong);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--screen-radius);
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.58), transparent 30%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2), var(--bg-3));
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      animation: appLaunch 0.72s ease-out;
+      display: flex;
+      flex-direction: column;
+      isolation: isolate;
+    }
+
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    @keyframes appLaunch {
+      0% {
+        opacity: 0;
+        transform: scale(0.93);
+        filter: blur(8px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.015);
+        filter: blur(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.85s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(1.03);
+      }
+    }
+
+    .bg-glow {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 14%, rgba(255, 182, 212, 0.22), transparent 24%),
+        radial-gradient(circle at 82% 18%, rgba(255, 220, 235, 0.22), transparent 22%),
+        radial-gradient(circle at 55% 88%, rgba(244, 143, 177, 0.12), transparent 30%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: calc(env(safe-area-inset-top) + 30px) 16px 10px;
+    }
+
+    .top-btn {
+      min-height: 36px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--pink-main);
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(216, 108, 156, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .top-btn:hover,
+    .top-btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(216, 108, 156, 0.16);
+    }
+
+    .topbar-spacer {
+      flex: 1;
+    }
+
+    .feed-scroll {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 14px calc(env(safe-area-inset-bottom) + 14px);
+      scrollbar-width: none;
+      min-height: 0;
+      scroll-behavior: smooth;
+    }
+
+    .feed-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 108px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .left-panel {
+      position: sticky;
+      top: 0;
+      padding-top: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .profile-box,
+    .section-card,
+    .post-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-box {
+      background: var(--glass);
+      border-radius: 22px;
+      padding: 10px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255,255,255,0.58);
+    }
+
+    .profile-box::before,
+    .section-card::before,
+    .post-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.72), transparent 36%),
+        linear-gradient(180deg, rgba(255,255,255,0.1), rgba(244,143,177,0.05));
+      pointer-events: none;
+    }
+
+    .profile-photo {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      aspect-ratio: 0.88 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #fff, #ffeef6);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.76);
+    }
+
+    .profile-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .profile-name {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 800;
+      color: var(--text-soft);
+      cursor: pointer;
+      text-align: left;
+      transition: color var(--ease), transform var(--ease);
+    }
+
+    .profile-name:hover,
+    .profile-name:focus-visible {
+      color: var(--pink-main);
+      transform: translateX(1px);
+    }
+
+    .profile-label {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.84;
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    .profile-info {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+      font-size: 10.8px;
+      color: var(--text-soft);
+      opacity: 0.86;
+      line-height: 1.55;
+      text-align: left;
+      white-space: pre-line;
+    }
+
+    .fun-area {
+      padding: 0 2px;
+    }
+
+    .fun-title {
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 800;
+      color: var(--pink-main);
+      margin-bottom: 8px;
+      text-align: left;
+    }
+
+    .fun-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .fun-btn {
+      width: 100%;
+      padding: 8px 8px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.84);
+      color: var(--text-soft);
+      font-size: 10.8px;
+      font-weight: 700;
+      text-align: left;
+      box-shadow: 0 6px 14px rgba(204,92,143,0.08);
+      transition: transform var(--ease), background var(--ease), box-shadow var(--ease);
+    }
+
+    .fun-btn:hover,
+    .fun-btn:focus-visible {
+      background: rgba(255,240,246,0.96);
+      box-shadow: 0 10px 18px rgba(204,92,143,0.12);
+      transform: translateY(-1px);
+    }
+
+    .right-panel {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+
+    .section-card {
+      background: var(--glass);
+      border-radius: 22px;
+      padding: 12px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255,255,255,0.58);
+    }
+
+    .section-title {
+      position: relative;
+      z-index: 1;
+      color: var(--pink-main);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .status-lines {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 2px;
+    }
+
+    .status-line {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(204,92,143,0.18), rgba(204,92,143,0.08));
+    }
+
+    .feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .post-card {
+      background: var(--glass-strong);
+      border-radius: 22px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(255,255,255,0.62);
+      opacity: 0;
+      transform: translateY(14px);
+      animation: postIn 0.45s ease forwards;
+    }
+
+    @keyframes postIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .post-head,
+    .post-body,
+    .post-actions,
+    .comment-list {
+      position: relative;
+      z-index: 1;
+    }
+
+    .post-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px 8px;
+    }
+
+    .post-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #fff;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.78);
+    }
+
+    .post-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .post-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .post-author {
+      color: var(--text-soft);
+      font-size: 12.5px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .post-time {
+      color: var(--text-soft);
+      opacity: 0.72;
+      font-size: 10.5px;
+      margin-top: 2px;
+    }
+
+    .post-body {
+      padding: 0 10px 10px;
+    }
+
+    .post-text {
+      color: var(--text-soft);
+      font-size: 12.5px;
+      line-height: 1.58;
+      white-space: pre-line;
+    }
+
+    .carousel {
+      margin-top: 10px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff2f8;
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55);
+    }
+
+    .carousel-track {
+      display: flex;
+      width: 100%;
+      transition: transform 0.35s ease;
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      aspect-ratio: 1.18 / 1;
+      overflow: hidden;
+      background: #fff2f8;
+    }
+
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .carousel-controls {
+      position: absolute;
+      inset: auto 8px 8px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .carousel-btn {
+      pointer-events: auto;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.8);
+      color: var(--pink-main);
+      font-size: 14px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .carousel-btn:hover,
+    .carousel-btn:focus-visible {
+      transform: scale(1.05);
+      background: rgba(255,255,255,0.95);
+    }
+
+    .carousel-dots {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+      background: rgba(255,255,255,0.58);
+      padding: 6px 8px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(204,92,143,0.32);
+    }
+
+    .dot.active {
+      background: var(--pink-soft);
+      box-shadow: 0 0 8px rgba(255,111,165,0.35);
+    }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px 10px;
+      flex-wrap: wrap;
+    }
+
+    .like-btn,
+    .comment-btn {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.74);
+      color: var(--text-soft);
+      font-size: 11.5px;
+      font-weight: 700;
+      box-shadow: 0 6px 14px rgba(204,92,143,0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform var(--ease), background var(--ease), color var(--ease), box-shadow var(--ease);
+    }
+
+    .like-btn:hover,
+    .comment-btn:hover,
+    .like-btn:focus-visible,
+    .comment-btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(204,92,143,0.12);
+      background: rgba(255,248,251,0.96);
+    }
+
+    .like-btn.liked {
+      background: linear-gradient(45deg, #ff6fa5, #f48fb1);
+      color: #fff;
+    }
+
+    .like-btn.pop {
+      animation: likePop 0.35s ease;
+    }
+
+    @keyframes likePop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.16); }
+      100% { transform: scale(1); }
+    }
+
+    .heart-burst {
+      position: absolute;
+      font-size: 14px;
+      pointer-events: none;
+      animation: burstUp 0.8s ease forwards;
+      z-index: 3;
+    }
+
+    @keyframes burstUp {
+      0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.7);
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-28px) scale(1.15);
+      }
+    }
+
+    .comment-list {
+      padding: 0 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .comment {
+      background: rgba(255,245,249,0.88);
+      border-radius: 14px;
+      padding: 8px 10px;
+      color: var(--text-soft);
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .comment b {
+      font-size: 11.2px;
+    }
+
+    .account-menu {
+      position: absolute;
+      top: calc(env(safe-area-inset-top) + 66px);
+      right: 16px;
+      z-index: 10;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 14px 24px rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.65);
+      display: none;
+      flex-direction: column;
+      min-width: 124px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .account-menu.show {
+      display: flex;
+      animation: menuPop 0.18s ease;
+    }
+
+    @keyframes menuPop {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .account-option {
+      background: transparent;
+      color: var(--text-soft);
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 12.5px;
+      font-weight: 700;
+      border-radius: 0;
+    }
+
+    .account-option + .account-option {
+      border-top: 1px solid rgba(204,92,143,0.08);
+    }
+
+    .account-option.active {
+      background: rgba(255,235,244,0.86);
+      color: var(--pink-main);
+    }
+
+    .account-option:hover,
+    .account-option:focus-visible {
+      background: rgba(255,242,247,0.94);
+    }
+
+    .feed-end {
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 11px;
+      opacity: 0.72;
+      padding: 4px 0 10px;
+    }
+
+    @media (max-width: 500px) {
+      html,
+      body {
+        background: #000;
+      }
+
+      body {
+        width: 100vw;
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+      }
+
+      .phone-frame {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        aspect-ratio: auto;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .phone-screen {
+        border-radius: 0;
+      }
+
+      .notch {
+        display: none;
+      }
+    }
+
+    @media (max-height: 720px) {
+      .topbar {
+        padding-top: calc(env(safe-area-inset-top) + 24px);
+      }
+
+      .layout {
+        grid-template-columns: 100px minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .profile-name {
+        font-size: 13px;
+      }
+
+      .post-text {
+        font-size: 12px;
+      }
+
+      .section-title {
+        font-size: 12.5px;
+      }
+
+      .fun-title {
+        font-size: 10.5px;
+      }
+
+      .fun-btn {
+        font-size: 10.2px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen" id="screen">
+      <div class="notch"></div>
+      <div class="bg-glow"></div>
+
+      <div class="topbar">
+        <button class="top-btn" id="hubBtn" type="button">← Hub</button>
+        <div class="topbar-spacer"></div>
+        <button class="top-btn" id="accountBtn" type="button">Account</button>
+      </div>
+
+      <div class="account-menu" id="accountMenu">
+        <button class="account-option active" type="button" data-account="kio">Kio</button>
+        <button class="account-option" type="button" data-account="eya">Eya</button>
+      </div>
+
+      <div class="feed-scroll" id="feedScroll">
+        <div class="layout">
+          <div class="left-panel">
+            <div class="profile-box">
+              <div class="profile-photo">
+                <img id="profileImg" src="images/apps/kio-profile.jpg" alt="Profile photo" onerror="this.style.display='none'">
+              </div>
+
+              <div class="profile-name" id="profileName" tabindex="0">Kio</div>
+              <div class="profile-label">Profile Account Name:</div>
+
+              <div class="profile-info" id="profileInfo">Status:
+always thinking of Eya
+
+Info:
+Background text...
+quiet, sweet, and a little clingy
+looking pogi 24/7</div>
+            </div>
+
+            <div class="fun-area">
+              <div class="fun-title">Wanna have some fun?</div>
+
+              <div class="fun-buttons">
+                <button class="fun-btn" type="button" data-game="game1.html">KIO: Story Mission</button>
+                <button class="fun-btn" type="button" data-game="game2.html">Love Note Hunt</button>
+                <button class="fun-btn" type="button" data-game="game3.html">Catch My Love</button>
+                <button class="fun-btn" type="button" data-game="game4.html">Basketball Rescue</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-panel">
+            <div class="section-card">
+              <div class="section-title">✦ KandE Scrolling ✦</div>
+              <div class="status-lines">
+                <div class="status-line" style="width:86%"></div>
+                <div class="status-line" style="width:92%"></div>
+                <div class="status-line" style="width:78%"></div>
+                <div class="status-line" style="width:90%"></div>
+              </div>
+            </div>
+
+            <div class="feed-list" id="feedList"></div>
+            <div class="feed-end">Keep scrolling for more 💗</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screen = document.getElementById("screen");
+    const hubBtn = document.getElementById("hubBtn");
+    const accountBtn = document.getElementById("accountBtn");
+    const accountMenu = document.getElementById("accountMenu");
+    const accountOptions = document.querySelectorAll(".account-option");
+    const profileImg = document.getElementById("profileImg");
+    const profileName = document.getElementById("profileName");
+    const profileInfo = document.getElementById("profileInfo");
+    const feedList = document.getElementById("feedList");
+    const feedScroll = document.getElementById("feedScroll");
+    const funButtons = document.querySelectorAll(".fun-btn");
+
+    let isLeaving = false;
+    let currentAccount = "kio";
+    let renderedCount = 0;
+    const POSTS_PER_BATCH = 5;
+
+    const accounts = {
+      kio: {
+        name: "Kio",
+        profileImage: "images/apps/kio-profile.jpg",
+        profileInfo: `Status:
+always thinking of Eya
+
+Info:
+Background text...
+quiet, sweet, and a little clingy
+looking pogi 24/7`,
+        infoPage: "kinfo.html",
+        posts: [
+          {
+            id: "k1",
+            author: "Kio",
+            avatar: "images/apps/kio-profile.jpg",
+            time: "Just now",
+            text: "If I could hug you through the screen, I already would. 🤍",
+            comments: [
+              { name: "Eya", text: "bilis mo naman mang lambing 😚" },
+              { name: "Kian", text: "kuya sweet mo naman" }
+            ]
+          },
+          {
+            id: "k2",
+            author: "Kio",
+            avatar: "images/apps/kio-profile.jpg",
+            time: "4 mins ago",
+            text: "Somebody owns my soft side and I’m not even hiding it anymore.",
+            images: [
+              "images/scroll/kio1.jpg",
+              "images/scroll/kio2.jpg",
+              "images/scroll/kio3.jpg"
+            ],
+            comments: [
+              { name: "Eya", text: "somebody pala ah 😌" },
+              { name: "Friend", text: "grabe ka bossing" }
+            ]
+          },
+          {
+            id: "k3",
+            author: "Kio",
+            avatar: "images/apps/kio-profile.jpg",
+            time: "12 mins ago",
+            text: "Fake status: still missing my girl even after talking to her all day.",
+            comments: [
+              { name: "Eya", text: "OA pero cute" },
+              { name: "Kio", text: "real lang" }
+            ]
+          },
+          {
+            id: "k4",
+            author: "Kio",
+            avatar: "images/apps/kio-profile.jpg",
+            time: "19 mins ago",
+            text: "Dumping a few fake pictures here because she deserves her own feed.",
+            images: [
+              "images/scroll/kio4.jpg",
+              "images/scroll/kio5.jpg"
+            ],
+            comments: [
+              { name: "Eya", text: "i'll customize this later 😌" },
+              { name: "Viewer", text: "cute feed" }
+            ]
+          },
+          {
+            id: "k5",
+            author: "Kio",
+            avatar: "images/apps/kio-profile.jpg",
+            time: "28 mins ago",
+            text: "POV: your favorite person keeps living inside your head rent free.",
+            comments: [
+              { name: "Eya", text: "as i should" }
+            ]
+          },
+          {
+            id: "k6",
+            author: "Kio",
+            avatar: "images/apps/kio-profile.jpg",
+            time: "42 mins ago",
+            text: "Not a real app, but the feelings here are suspiciously real.",
+            images: [
+              "images/scroll/kio6.jpg",
+              "images/scroll/kio7.jpg",
+              "images/scroll/kio8.jpg"
+            ],
+            comments: [
+              { name: "Eya", text: "this one is my favorite" },
+              { name: "Friend", text: "fb core" }
+            ]
+          }
+        ]
+      },
+
+      eya: {
+        name: "Eya",
+        profileImage: "images/apps/eya-profile.jpg",
+        profileInfo: `Status:
+a little dramatic but lovable
+
+Info:
+Background text...
+cute, clingy, and secretly soft
+professionally missing Kio`,
+        infoPage: "einfo.html",
+        posts: [
+          {
+            id: "e1",
+            author: "Eya",
+            avatar: "images/apps/eya-profile.jpg",
+            time: "Just now",
+            text: "Fake status: yes, I still want attention even after getting attention.",
+            comments: [
+              { name: "Kio", text: "ikaw talaga 😭" },
+              { name: "Eya", text: "correct" }
+            ]
+          },
+          {
+            id: "e2",
+            author: "Eya",
+            avatar: "images/apps/eya-profile.jpg",
+            time: "6 mins ago",
+            text: "Collecting little moments and turning them into something pretty.",
+            images: [
+              "images/scroll/eya1.jpg",
+              "images/scroll/eya2.jpg",
+              "images/scroll/eya3.jpg"
+            ],
+            comments: [
+              { name: "Kio", text: "gandaaa" },
+              { name: "Friend", text: "soft launch energy" }
+            ]
+          },
+          {
+            id: "e3",
+            author: "Eya",
+            avatar: "images/apps/eya-profile.jpg",
+            time: "15 mins ago",
+            text: "Reminder that being obsessed with your boyfriend a little is actually cute.",
+            comments: [
+              { name: "Kio", text: "a little lang?" }
+            ]
+          },
+          {
+            id: "e4",
+            author: "Eya",
+            avatar: "images/apps/eya-profile.jpg",
+            time: "23 mins ago",
+            text: "Fake pictures area (IMG) — customize these later however you want 💕",
+            images: [
+              "images/scroll/eya4.jpg",
+              "images/scroll/eya5.jpg"
+            ],
+            comments: [
+              { name: "Kio", text: "waiting for the final version 😚" }
+            ]
+          },
+          {
+            id: "e5",
+            author: "Eya",
+            avatar: "images/apps/eya-profile.jpg",
+            time: "31 mins ago",
+            text: "My feed, my rules, my lambing, my man.",
+            comments: [
+              { name: "Kio", text: "yes ma'am" },
+              { name: "Viewer", text: "slay" }
+            ]
+          },
+          {
+            id: "e6",
+            author: "Eya",
+            avatar: "images/apps/eya-profile.jpg",
+            time: "48 mins ago",
+            text: "Some feelings are too cute to keep in drafts only.",
+            images: [
+              "images/scroll/eya6.jpg",
+              "images/scroll/eya7.jpg",
+              "images/scroll/eya8.jpg"
+            ],
+            comments: [
+              { name: "Kio", text: "post mo lang lahat" }
+            ]
+          }
+        ]
+      }
+    };
+
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    let currentFeedPool = [];
+
+    function goToPage(url) {
+      if (isLeaving) return;
+      isLeaving = true;
+      screen.classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = url;
+      }, 850);
+    }
+
+    function updateAccountUI() {
+      const account = accounts[currentAccount];
+      profileImg.src = account.profileImage;
+      profileName.textContent = account.name;
+      profileInfo.textContent = account.profileInfo;
+
+      accountOptions.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.account === currentAccount);
+      });
+    }
+
+    function createCommentHTML(comments = []) {
+      if (!comments.length) return "";
+      return `
+        <div class="comment-list">
+          ${comments.map(c => `
+            <div class="comment"><b>${c.name}</b> ${c.text}</div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function createCarousel(images = []) {
+      const carouselId = `carousel-${Math.random().toString(36).slice(2, 9)}`;
+      return `
+        <div class="carousel" data-carousel-id="${carouselId}">
+          <div class="carousel-track">
+            ${images.map(src => `
+              <div class="carousel-slide">
+                <img src="${src}" alt="Post picture" onerror="this.style.display='none'">
+              </div>
+            `).join("")}
+          </div>
+
+          <div class="carousel-controls">
+            <button class="carousel-btn prev" type="button">‹</button>
+            <div class="carousel-dots">
+              ${images.map((_, i) => `<span class="dot ${i === 0 ? "active" : ""}"></span>`).join("")}
+            </div>
+            <button class="carousel-btn next" type="button">›</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function createHeartBurst(button) {
+      const rect = button.getBoundingClientRect();
+      const parentRect = button.closest(".post-card").getBoundingClientRect();
+
+      for (let i = 0; i < 6; i++) {
+        const heart = document.createElement("div");
+        heart.className = "heart-burst";
+        heart.textContent = "💗";
+        heart.style.left = `${rect.left - parentRect.left + 20 + (Math.random() * 18 - 9)}px`;
+        heart.style.top = `${rect.top - parentRect.top + 6}px`;
+        button.closest(".post-card").appendChild(heart);
+        setTimeout(() => heart.remove(), 800);
+      }
+    }
+
+    function buildPost(post) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "post-card";
+
+      const carouselHTML = post.images && post.images.length
+        ? createCarousel(post.images)
+        : "";
+
+      wrapper.innerHTML = `
+        <div class="post-head">
+          <div class="post-avatar">
+            <img src="${post.avatar}" alt="${post.author}" onerror="this.style.display='none'">
+          </div>
+          <div class="post-meta">
+            <div class="post-author">${post.author}</div>
+            <div class="post-time">${post.time}</div>
+          </div>
+        </div>
+
+        <div class="post-body">
+          <div class="post-text">${post.text}</div>
+          ${carouselHTML}
+        </div>
+
+        <div class="post-actions">
+          <button class="like-btn" type="button">❤️ Like</button>
+          <button class="comment-btn" type="button">💬 Comments</button>
+        </div>
+
+        ${createCommentHTML(post.comments)}
+      `;
+
+      const likeBtn = wrapper.querySelector(".like-btn");
+      likeBtn.addEventListener("click", () => {
+        likeBtn.classList.toggle("liked");
+        likeBtn.classList.remove("pop");
+        void likeBtn.offsetWidth;
+        likeBtn.classList.add("pop");
+
+        if (likeBtn.classList.contains("liked")) {
+          likeBtn.innerHTML = "💖 Liked";
+          createHeartBurst(likeBtn);
+        } else {
+          likeBtn.innerHTML = "❤️ Like";
+        }
+      });
+
+      const commentBtn = wrapper.querySelector(".comment-btn");
+      const commentList = wrapper.querySelector(".comment-list");
+      if (commentList) {
+        commentBtn.addEventListener("click", () => {
+          const isHidden = commentList.style.display === "none";
+          commentList.style.display = isHidden ? "flex" : "none";
+        });
+      } else {
+        commentBtn.style.opacity = "0.6";
+      }
+
+      const carousel = wrapper.querySelector(".carousel");
+      if (carousel) {
+        setupCarousel(carousel);
+      }
+
+      return wrapper;
+    }
+
+    function setupCarousel(carousel) {
+      const track = carousel.querySelector(".carousel-track");
+      const slides = carousel.querySelectorAll(".carousel-slide");
+      const dots = carousel.querySelectorAll(".dot");
+      const prev = carousel.querySelector(".prev");
+      const next = carousel.querySelector(".next");
+      let index = 0;
+
+      function update() {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+      }
+
+      prev.addEventListener("click", (e) => {
+        e.stopPropagation();
+        index = (index - 1 + slides.length) % slides.length;
+        update();
+      });
+
+      next.addEventListener("click", (e) => {
+        e.stopPropagation();
+        index = (index + 1) % slides.length;
+        update();
+      });
+
+      update();
+    }
+
+    function resetFeed() {
+      feedList.innerHTML = "";
+      renderedCount = 0;
+      currentFeedPool = shuffle(accounts[currentAccount].posts);
+      appendMorePosts();
+      appendMorePosts();
+      feedScroll.scrollTop = 0;
+    }
+
+    function appendMorePosts() {
+      const batch = [];
+      for (let i = 0; i < POSTS_PER_BATCH; i++) {
+        const item = currentFeedPool[(renderedCount + i) % currentFeedPool.length];
+        batch.push(item);
+      }
+
+      batch.forEach(post => {
+        feedList.appendChild(buildPost(post));
+      });
+
+      renderedCount += POSTS_PER_BATCH;
+    }
+
+    hubBtn.addEventListener("click", () => {
+      goToPage("hubpage.html");
+    });
+
+    accountBtn.addEventListener("click", () => {
+      accountMenu.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!accountMenu.contains(e.target) && e.target !== accountBtn) {
+        accountMenu.classList.remove("show");
+      }
+    });
+
+    accountOptions.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentAccount = btn.dataset.account;
+        updateAccountUI();
+        resetFeed();
+        accountMenu.classList.remove("show");
+      });
+    });
+
+    profileName.addEventListener("click", () => {
+      goToPage(accounts[currentAccount].infoPage);
+    });
+
+    profileName.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        goToPage(accounts[currentAccount].infoPage);
+      }
+    });
+
+    funButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        goToPage(btn.dataset.game);
+      });
+    });
+
+    feedScroll.addEventListener("scroll", () => {
+      const nearBottom = feedScroll.scrollTop + feedScroll.clientHeight >= feedScroll.scrollHeight - 220;
+      if (nearBottom) {
+        appendMorePosts();
+      }
+    });
+
+    updateAccountUI();
+    resetFeed();
+  </script>
+</body>
+</html>

@@ -1,0 +1,970 @@
+<!-- =========================
+   5thpage.html
+========================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#f3dbe6" />
+  <title>Choose a Game</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --pink-main: #d86c9c;
+      --pink-deep: #c85a8d;
+      --pink-soft: #f48fb1;
+      --pink-light: #f8bbd0;
+      --pink-border: #f4a6c8;
+      --text-soft: #b85f87;
+
+      --bg-1: #fff7fb;
+      --bg-2: #f7e5ef;
+      --bg-3: #eed8e6;
+
+      --dusk-1: #5a3756;
+      --dusk-2: #3f2744;
+      --dusk-3: #2b1b33;
+
+      --glass: rgba(255, 255, 255, 0.14);
+      --glass-strong: rgba(255, 255, 255, 0.2);
+      --shadow-soft: 0 14px 32px rgba(216, 108, 156, 0.14);
+      --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 18px 36px rgba(216, 108, 156, 0.22);
+
+      --frame-radius: 50px;
+      --screen-radius: 40px;
+      --phone-width: min(390px, 94vw);
+
+      --ease: 0.22s ease;
+      --launch: 0.72s ease-out;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      height: -webkit-fill-available;
+      overflow: hidden;
+      overscroll-behavior: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0d8e1;
+      touch-action: manipulation;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      outline: none;
+      transition:
+        transform 0.15s ease,
+        box-shadow var(--ease),
+        opacity var(--ease),
+        background var(--ease),
+        color var(--ease),
+        filter var(--ease);
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    .phone-frame {
+      width: var(--phone-width);
+      aspect-ratio: 390 / 844;
+      background: #000;
+      border-radius: var(--frame-radius);
+      padding: 12px;
+      box-shadow: var(--shadow-strong);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--screen-radius);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      animation: appLaunch var(--launch);
+      isolation: isolate;
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 26%),
+        radial-gradient(circle at 20% 18%, rgba(255, 176, 210, 0.2), transparent 24%),
+        radial-gradient(circle at 82% 14%, rgba(255, 220, 235, 0.12), transparent 22%),
+        linear-gradient(180deg, #6b4565 0%, #4f3254 30%, #372342 64%, #25172e 100%);
+    }
+
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    @keyframes appLaunch {
+      0% {
+        opacity: 0;
+        transform: scale(0.93);
+        filter: blur(8px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.015);
+        filter: blur(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.85s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(1.03);
+      }
+    }
+
+    .bg-glow {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(244, 143, 177, 0.22), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(255, 214, 234, 0.12), transparent 20%),
+        radial-gradient(circle at 50% 88%, rgba(248, 187, 208, 0.08), transparent 28%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sparkles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.75);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.55);
+      animation: twinkle 3.4s infinite ease-in-out;
+      opacity: 0.45;
+    }
+
+    @keyframes twinkle {
+      0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.18;
+      }
+      50% {
+        transform: scale(1.12);
+        opacity: 0.85;
+      }
+    }
+
+    .header {
+      position: relative;
+      z-index: 2;
+      padding: calc(env(safe-area-inset-top) + 30px) 16px 8px;
+      color: #fff;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .back-hub-btn,
+    .mini-pill {
+      min-height: 36px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .back-hub-btn:hover,
+    .back-hub-btn:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .mini-pill {
+      opacity: 0.94;
+      pointer-events: none;
+    }
+
+    .header-text {
+      text-align: center;
+      padding: 4px 10px 0;
+    }
+
+    .header h2 {
+      font-size: clamp(21px, 5.8vw, 24px);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+    }
+
+    .header p {
+      font-size: clamp(12px, 3.2vw, 13px);
+      opacity: 0.84;
+      margin-top: 6px;
+    }
+
+    .games-wrap {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scrollbar-width: none;
+      min-height: 0;
+    }
+
+    .games-wrap::-webkit-scrollbar {
+      display: none;
+    }
+
+    .game-card {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      cursor: pointer;
+      min-height: 140px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 18px 34px rgba(0, 0, 0, 0.22),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+      transform: translateY(0);
+      transition:
+        transform 0.2s ease,
+        box-shadow var(--ease),
+        filter var(--ease);
+      isolation: isolate;
+    }
+
+    .game-card:hover,
+    .game-card:focus-within {
+      transform: translateY(-2px);
+      box-shadow:
+        0 22px 40px rgba(0, 0, 0, 0.26),
+        0 10px 24px rgba(216, 108, 156, 0.12);
+      filter: saturate(1.03);
+    }
+
+    .game-card:active {
+      transform: scale(0.988);
+    }
+
+    .thumb-wrap {
+      position: relative;
+      width: 100%;
+      height: 140px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    }
+
+    .thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.78);
+      position: relative;
+      z-index: 1;
+      transition: transform var(--ease), filter var(--ease);
+    }
+
+    .game-card:hover .thumb-wrap img,
+    .game-card:focus-within .thumb-wrap img {
+      transform: scale(1.03);
+      filter: brightness(0.82);
+    }
+
+    .thumb-fallback {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 30px;
+      font-weight: 800;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 35%),
+        linear-gradient(180deg, rgba(244, 143, 177, 0.26), rgba(200, 90, 141, 0.18));
+    }
+
+    .game-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(255,255,255,0.3), transparent 26%),
+        linear-gradient(120deg, transparent, rgba(255,255,255,0.12), transparent);
+      opacity: 0.42;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px;
+      background: linear-gradient(
+        180deg,
+        rgba(20, 10, 25, 0.04) 0%,
+        rgba(28, 16, 35, 0.28) 42%,
+        rgba(24, 14, 30, 0.68) 100%
+      );
+      z-index: 4;
+    }
+
+    .card-title {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+    }
+
+    .card-subtitle {
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 12px;
+      line-height: 1.38;
+      max-width: 95%;
+    }
+
+    .card-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(255, 255, 255, 0.38);
+      animation: ripple 0.6s linear;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+      }
+    }
+
+    .bottom-buttons {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px calc(env(safe-area-inset-bottom) + 12px);
+    }
+
+    .btn {
+      flex: 1;
+      min-height: 46px;
+      padding: 13px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .restart {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+    }
+
+    .shutdown {
+      background: linear-gradient(180deg, #f7a3c3, #ef87b4);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(255, 105, 180, 0.28);
+    }
+
+    .poweroff {
+      position: absolute;
+      inset: 0;
+      background: rgba(16, 9, 20, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 40;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .poweroff.show {
+      display: flex;
+    }
+
+    .power-title {
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .power-subtitle {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .slider {
+      width: min(280px, 100%);
+      height: 58px;
+      border-radius: 40px;
+      background: rgba(255,255,255,0.14);
+      display: flex;
+      align-items: center;
+      padding: 7px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.08),
+        0 10px 24px rgba(0, 0, 0, 0.14);
+    }
+
+    .slider-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #f48fb1, #ffb4d1, #f8bbd0);
+      opacity: 0.8;
+      transition: width 0.08s linear;
+      z-index: 0;
+    }
+
+    .slider-track-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 13px;
+      font-weight: 600;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .knob {
+      width: 44px;
+      height: 44px;
+      background: white;
+      color: var(--pink-main);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+      position: absolute;
+      left: 7px;
+      top: 7px;
+      z-index: 2;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.24);
+      touch-action: none;
+      transition: left 0.18s ease;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .power-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      width: min(280px, 100%);
+    }
+
+    .smallbtn {
+      flex: 1;
+      padding: 11px 14px;
+      border-radius: 18px;
+      font-weight: 700;
+      min-height: 42px;
+    }
+
+    .cancel {
+      background: rgba(255, 255, 255, 0.14);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .force {
+      background: linear-gradient(180deg, #f7a3c3, #ef87b4);
+      color: white;
+      box-shadow: 0 8px 18px rgba(255, 105, 180, 0.24);
+    }
+
+    .off-screen {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      z-index: 50;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .off-screen.show {
+      display: flex;
+    }
+
+    .off-screen .off-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .off-screen .off-sub {
+      font-size: 13px;
+      opacity: 0.72;
+    }
+
+    @media (max-width: 500px) {
+      html,
+      body {
+        background: #000;
+      }
+
+      body {
+        width: 100vw;
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+      }
+
+      .phone-frame {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        aspect-ratio: auto;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .phone-screen {
+        border-radius: 0;
+      }
+
+      .notch {
+        display: none;
+      }
+    }
+
+    @media (max-height: 720px) {
+      .header {
+        padding-top: calc(env(safe-area-inset-top) + 24px);
+      }
+
+      .header h2 {
+        font-size: 20px;
+      }
+
+      .games-wrap {
+        gap: 12px;
+        padding-top: 10px;
+      }
+
+      .game-card,
+      .thumb-wrap {
+        min-height: 126px;
+        height: 126px;
+      }
+
+      .thumb-wrap img {
+        height: 126px;
+      }
+
+      .card-title {
+        font-size: 15px;
+      }
+
+      .card-subtitle {
+        font-size: 11.5px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen" id="screen">
+      <div class="notch"></div>
+      <div class="bg-glow"></div>
+
+      <div class="sparkles" aria-hidden="true">
+        <span class="sparkle" style="top:10%;left:14%;animation-delay:0s;"></span>
+        <span class="sparkle" style="top:17%;left:83%;animation-delay:.7s;"></span>
+        <span class="sparkle" style="top:33%;left:9%;animation-delay:1.5s;"></span>
+        <span class="sparkle" style="top:39%;left:78%;animation-delay:2.1s;"></span>
+        <span class="sparkle" style="top:58%;left:15%;animation-delay:1s;"></span>
+        <span class="sparkle" style="top:65%;left:85%;animation-delay:2.7s;"></span>
+        <span class="sparkle" style="top:81%;left:18%;animation-delay:.4s;"></span>
+        <span class="sparkle" style="top:86%;left:70%;animation-delay:1.8s;"></span>
+      </div>
+
+      <div class="header">
+        <div class="topbar">
+          <button class="back-hub-btn" id="backHubBtn" type="button">← Hub</button>
+          <div class="mini-pill">Games</div>
+        </div>
+
+        <div class="header-text">
+          <h2>Choose a Game 🎮</h2>
+          <p>Pick one, Baby 🤭</p>
+        </div>
+      </div>
+
+      <div class="games-wrap">
+        <div class="game-card" data-url="game1.html">
+          <div class="thumb-wrap">
+            <div class="thumb-fallback">1</div>
+            <img src="images/3rdpage/1.jpg" alt="KIO Story Mission" onerror="this.style.display='none'">
+          </div>
+          <div class="card-tag">Game 1</div>
+          <div class="card-overlay">
+            <div class="card-title">KIO: Story Mission</div>
+            <div class="card-subtitle">Follow Kio through his mission and uncover the story hidden in the memories.</div>
+          </div>
+        </div>
+
+        <div class="game-card" data-url="game2.html">
+          <div class="thumb-wrap">
+            <div class="thumb-fallback">2</div>
+            <img src="images/3rdpage/2.jpg" alt="Love Note Hunt" onerror="this.style.display='none'">
+          </div>
+          <div class="card-tag">Game 2</div>
+          <div class="card-overlay">
+            <div class="card-title">Love Note Hunt</div>
+            <div class="card-subtitle">Find the hidden notes and discover little messages.</div>
+          </div>
+        </div>
+
+        <div class="game-card" data-url="game3.html">
+          <div class="thumb-wrap">
+            <div class="thumb-fallback">3</div>
+            <img src="images/3rdpage/3.jpg" alt="Catch My Love" onerror="this.style.display='none'">
+          </div>
+          <div class="card-tag">Game 3</div>
+          <div class="card-overlay">
+            <div class="card-title">Catch My Love</div>
+            <div class="card-subtitle">Catch the falling hearts and survive the challenge.</div>
+          </div>
+        </div>
+
+        <div class="game-card" data-url="game4.html">
+          <div class="thumb-wrap">
+            <div class="thumb-fallback">4</div>
+            <img src="images/3rdpage/4.jpg" alt="Basketball Rescue" onerror="this.style.display='none'">
+          </div>
+          <div class="card-tag">Game 4</div>
+          <div class="card-overlay">
+            <div class="card-title">Basketball Rescue</div>
+            <div class="card-subtitle">Shoot, score, and save Eya and Kian with Kio.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-buttons">
+        <button class="btn restart" id="restartBtn" type="button">Restart</button>
+        <button class="btn shutdown" id="shutdownBtn" type="button">⏻ Shut Down</button>
+      </div>
+
+      <div class="poweroff" id="poweroff" aria-hidden="true">
+        <div class="power-title">Power Menu</div>
+        <div class="power-subtitle">Slide the button to turn off</div>
+
+        <div class="slider" id="slider">
+          <div class="slider-fill" id="sliderFill"></div>
+          <div class="slider-track-text">Slide to power off</div>
+          <div class="knob" id="knob">⏻</div>
+        </div>
+
+        <div class="power-buttons">
+          <button class="smallbtn cancel" id="cancelPowerBtn" type="button">Cancel</button>
+          <button class="smallbtn force" id="forcePowerBtn" type="button">Power Off</button>
+        </div>
+      </div>
+
+      <div class="off-screen" id="offScreen">
+        <div class="off-title">Powered Off</div>
+        <div class="off-sub">Refresh or restart the app to begin again 💗</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screen = document.getElementById("screen");
+    const cards = document.querySelectorAll(".game-card");
+    const restartBtn = document.getElementById("restartBtn");
+    const shutdownBtn = document.getElementById("shutdownBtn");
+    const backHubBtn = document.getElementById("backHubBtn");
+    const power = document.getElementById("poweroff");
+    const offScreen = document.getElementById("offScreen");
+    const cancelPowerBtn = document.getElementById("cancelPowerBtn");
+    const forcePowerBtn = document.getElementById("forcePowerBtn");
+    const slider = document.getElementById("slider");
+    const sliderFill = document.getElementById("sliderFill");
+    const knob = document.getElementById("knob");
+
+    let poweringOff = false;
+    let dragging = false;
+    let startX = 0;
+    let knobStartLeft = 7;
+    let isLeaving = false;
+
+    function createRipple(target, x, y) {
+      const circle = document.createElement("span");
+      circle.classList.add("ripple");
+
+      const rect = target.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 0.6;
+      circle.style.width = `${size}px`;
+      circle.style.height = `${size}px`;
+      circle.style.left = `${x - rect.left}px`;
+      circle.style.top = `${y - rect.top}px`;
+
+      target.appendChild(circle);
+      setTimeout(() => circle.remove(), 600);
+    }
+
+    function goWithFade(url) {
+      if (poweringOff || isLeaving) return;
+      isLeaving = true;
+      screen.classList.add("fade-out");
+
+      setTimeout(() => {
+        window.location.href = url;
+      }, 850);
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener("click", (e) => {
+        const pointX =
+          e.clientX ||
+          (e.touches && e.touches[0]?.clientX) ||
+          card.getBoundingClientRect().left + 40;
+
+        const pointY =
+          e.clientY ||
+          (e.touches && e.touches[0]?.clientY) ||
+          card.getBoundingClientRect().top + 40;
+
+        createRipple(card, pointX, pointY);
+
+        const url = card.dataset.url;
+        setTimeout(() => goWithFade(url), 180);
+      });
+    });
+
+    restartBtn.addEventListener("click", () => {
+      goWithFade("1stpage.html");
+    });
+
+    backHubBtn.addEventListener("click", () => {
+      goWithFade("hubpage.html");
+    });
+
+    function openPower() {
+      power.classList.add("show");
+      power.setAttribute("aria-hidden", "false");
+      resetKnob();
+    }
+
+    function closePower() {
+      power.classList.remove("show");
+      power.setAttribute("aria-hidden", "true");
+      resetKnob();
+    }
+
+    function powerOff() {
+      poweringOff = true;
+      power.classList.remove("show");
+      power.setAttribute("aria-hidden", "true");
+      offScreen.classList.add("show");
+    }
+
+    shutdownBtn.addEventListener("click", openPower);
+    cancelPowerBtn.addEventListener("click", closePower);
+    forcePowerBtn.addEventListener("click", powerOff);
+
+    power.addEventListener("click", (e) => {
+      if (e.target === power) closePower();
+    });
+
+    function getMaxLeft() {
+      return slider.clientWidth - knob.clientWidth - 7;
+    }
+
+    function resetKnob() {
+      knob.style.left = "7px";
+      sliderFill.style.width = "0%";
+    }
+
+    function startDrag(clientX) {
+      dragging = true;
+      startX = clientX;
+      knobStartLeft = parseFloat(knob.style.left || "7");
+      knob.style.transition = "none";
+      sliderFill.style.transition = "none";
+    }
+
+    function moveDrag(clientX) {
+      if (!dragging) return;
+
+      const dx = clientX - startX;
+      let nextLeft = knobStartLeft + dx;
+
+      nextLeft = Math.max(7, Math.min(getMaxLeft(), nextLeft));
+      knob.style.left = `${nextLeft}px`;
+
+      const denominator = getMaxLeft() - 7;
+      const percent = denominator > 0
+        ? ((nextLeft - 7) / denominator) * 100
+        : 0;
+
+      sliderFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+
+      const reachedEnd = nextLeft >= getMaxLeft() - 4;
+      if (reachedEnd) {
+        dragging = false;
+        knob.style.transition = "left 0.18s ease";
+        sliderFill.style.transition = "width 0.08s linear";
+        powerOff();
+      }
+    }
+
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      knob.style.transition = "left 0.18s ease";
+      sliderFill.style.transition = "width 0.18s ease";
+      resetKnob();
+    }
+
+    knob.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      startDrag(e.clientX);
+      knob.setPointerCapture(e.pointerId);
+    });
+
+    knob.addEventListener("pointermove", (e) => {
+      moveDrag(e.clientX);
+    });
+
+    knob.addEventListener("pointerup", endDrag);
+    knob.addEventListener("pointercancel", endDrag);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && power.classList.contains("show")) {
+        closePower();
+      }
+    });
+  </script>
+</body>
+</html>
